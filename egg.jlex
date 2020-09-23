@@ -58,6 +58,7 @@ class CharNum {
 
 DIGIT=        [0-9]
 WHITESPACE=   [\040\t]
+LETTER=       [A-Za-z]
 
 %implements java_cup.runtime.Scanner
 %function next_token
@@ -71,9 +72,24 @@ return new Symbol(sym.EOF);
 
 %%
 
-{DIGIT}+  { // NOTE: the following computation of the integer value does NOT
-            //       check for overflow.  This must be changed.
-            int val = (new Integer(yytext())).intValue();
+
+"bool"	{
+	  Symbol S = new Symbol(sym.BOOL, new TokenVal(yyline+1, CharNum.num));
+	  CharNum.num += 4;
+	  return S;
+	}
+
+{DIGIT}+  {
+	    double d = (new Double(yytext())).doubleValue();	// convert string to double
+	    int val;	// Variable to return
+
+	    if (d > Integer.MAX_VALUE) { // check for overflow
+	      ErrMsg.warn(yyline+1, CharNum.num, "integer literal too large");
+	      val = (new Integer(Integer.MAX_VALUE)).intValue();
+	    } else {
+	      val = (new Integer(yytext())). intValue();
+	    }
+            
             Symbol S = new Symbol(sym.INTLITERAL,
                              new IntLitTokenVal(yyline+1, CharNum.num, val));
             CharNum.num += yytext().length();
@@ -81,6 +97,13 @@ return new Symbol(sym.EOF);
           }
 
 \n        { CharNum.num = 1; }
+
+({LETTER}|"_")({LETTER}|{DIGIT}|"_")* {
+	  String ID = yytext();
+	  Symbol S = new Symbol(sym.ID, new IdTokenVal(yyline+1, CharNum.num, ID));
+	  CharNum.num += yytext().length();
+	  return S;
+	}
 
 {WHITESPACE}+  { CharNum.num += yytext().length(); }
 
