@@ -25,4 +25,5 @@ RETURN
 "&!88"
 "use \n to denote a newline character"
 "include a quote like this \" and a backslash like this \\"
+"unterminated
 "backslash followed by space: \ is not allowed"

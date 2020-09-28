@@ -171,11 +171,22 @@ return new Symbol(sym.EOF);
 	  return S;
 	}
 
-\"(("\n"|"\t"|"\'"|"\\""|"\?"|(\\\\))|[^\"\\])*\" {
+\"(("\n"|"\t"|"\'"|"\\""|"\?"|(\\\\))|[^\"\\])*[^\"]$  { // check for unterminated
+	  ErrMsg.fatal(yyline+1, CharNum.num, "unterminated string literal ignored");
+	  CharNum.num += yytext().length();
+	}
+
+\"(("\n"|"\t"|"\'"|"\\""|"\?"|(\\\\))|[^\"\\])*\" {	// check for good strings
 	  String Str = yytext();
 	  Symbol S = new Symbol(sym.STRINGLITERAL, new StrLitTokenVal(yyline+1, CharNum.num, Str));
 	  CharNum.num += yytext().length();
 	  return S;
+	}
+
+
+\"([^\"])*\" {
+	  ErrMsg.fatal(yyline+1, CharNum.num, "string literal with bad escaped character ignored");
+	  CharNum.num += yytext().length();
 	}
 
 {WHITESPACE}+  { CharNum.num += yytext().length(); }
