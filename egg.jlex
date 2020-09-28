@@ -171,6 +171,13 @@ return new Symbol(sym.EOF);
 	  return S;
 	}
 
+\"(("\n"|"\t"|"\'"|"\\""|"\?"|(\\\\))|[^\"\\])*\" {
+	  String Str = yytext();
+	  Symbol S = new Symbol(sym.STRINGLITERAL, new StrLitTokenVal(yyline+1, CharNum.num, Str));
+	  CharNum.num += yytext().length();
+	  return S;
+	}
+
 {WHITESPACE}+  { CharNum.num += yytext().length(); }
 
 "+"       { Symbol S = new Symbol(sym.PLUS, new TokenVal(yyline+1, CharNum.num));
