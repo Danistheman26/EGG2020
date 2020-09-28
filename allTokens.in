@@ -14,10 +14,3 @@ Return
 <
 RETURN
 2147483650
-"This should \n work"
-"include a quote like this \" and a backslash like this \\"
-"unterminated \n\n\"
-"also unterminated \"
-"backslash followed by space: \ is not allowed"
-"bad escaped character: \a AND not terminated
-"yeeeee"
