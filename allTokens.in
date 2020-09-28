@@ -14,16 +14,10 @@ Return
 <
 RETURN
 2147483650
-"Hello"
-"This will \n work"
-"So will \t this"
-"This will \' also"
-"What about \" this?"
-"This \? works"
-"This should be \\ the last to work"
-""
-"&!88"
-"use \n to denote a newline character"
+"This should \n work"
 "include a quote like this \" and a backslash like this \\"
-"unterminated
+"unterminated \n\n\"
+"also unterminated \"
 "backslash followed by space: \ is not allowed"
+"bad escaped character: \a AND not terminated
+"yeeeee"

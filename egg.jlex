@@ -171,22 +171,28 @@ return new Symbol(sym.EOF);
 	  return S;
 	}
 
-\"(("\n"|"\t"|"\'"|"\\""|"\?"|(\\\\))|[^\"\\])*[^\"]$  { // check for unterminated
+\"(("\n"|"\t"|"\'"|"\\""|"\?"|(\\\\))|[^\"\\])*[^\"]  { // check for unterminated
 	  ErrMsg.fatal(yyline+1, CharNum.num, "unterminated string literal ignored");
-	  CharNum.num += yytext().length();
+	  CharNum.num = 1;
 	}
 
-\"(("\n"|"\t"|"\'"|"\\""|"\?"|(\\\\))|[^\"\\])*\" {	// check for good strings
+\"(("\n"|"\t"|"\'"|"\\""|"\?"|(\\\\))|[^\"\\\n])*\" {	// check for good strings
 	  String Str = yytext();
+	  System.out.println("Valid Line" + Str);
 	  Symbol S = new Symbol(sym.STRINGLITERAL, new StrLitTokenVal(yyline+1, CharNum.num, Str));
 	  CharNum.num += yytext().length();
 	  return S;
 	}
 
 
-\"([^\"])*\" {
+\"([^\"\n])*\" {
 	  ErrMsg.fatal(yyline+1, CharNum.num, "string literal with bad escaped character ignored");
 	  CharNum.num += yytext().length();
+	}
+
+\"([^\"\n])*[^\"] {
+	  ErrMsg.fatal(yyline+1, CharNum.num, "unterminated string literal with bad escaped character ignored");
+	  CharNum.num = 1;
 	}
 
 {WHITESPACE}+  { CharNum.num += yytext().length(); }
