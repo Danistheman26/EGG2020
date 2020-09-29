@@ -286,7 +286,7 @@ return new Symbol(sym.EOF);
             return S;
           }          
           
-"=="       { Symbol S = new Symbol(sym.ASSIGN, new TokenVal(yyline+1, CharNum.num));
+"=="       { Symbol S = new Symbol(sym.EQUALS, new TokenVal(yyline+1, CharNum.num));
             CharNum.num += 2;
             return S;
           }          
@@ -316,10 +316,14 @@ return new Symbol(sym.EOF);
             return S;
           }         
           
-"="       { Symbol S = new Symbol(sym.EQUALS, new TokenVal(yyline+1, CharNum.num));
+"="       { Symbol S = new Symbol(sym.ASSIGN, new TokenVal(yyline+1, CharNum.num));
             CharNum.num++;
             return S;
-          }           
+          }  
+
+(//).*	  {}
+
+(##).*	  {}         
         
 .         { ErrMsg.fatal(yyline+1, CharNum.num,
                          "ignoring illegal character: " + yytext());
