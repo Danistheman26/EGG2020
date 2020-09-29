@@ -14,14 +14,14 @@ public class P2 {
         // test all tokens
         testAllTokens();
         CharNum.num = 1;
-    
-        // ADD CALLS TO OTHER TEST METHODS HERE
+    	
+    	testCharNums();
     }
 
     /**
      * testAllTokens
      *
-     * Open and read from file allTokens.txt
+     * Open and read from files that have tests in them
      * For each token read, write the corresponding string to allTokens.out
      * If the input file contains all tokens, one per line, we can verify
      * correctness of the scanner by comparing the input and output files
@@ -54,7 +54,7 @@ public class P2 {
 		    case sym.BOOL:
 		        outFile.println("bool"); 
 		        break;
-				case sym.INT:
+		    case sym.INT:
 		        outFile.println("int");
 		        break;
 		    case sym.VOID:
@@ -168,7 +168,7 @@ public class P2 {
 		    case sym.GREATEREQ:
 		        outFile.println(">=");
 		        break;
-				case sym.ASSIGN:
+		    case sym.ASSIGN:
 		        outFile.println("=");
 		        break;
 				default:
@@ -177,8 +177,212 @@ public class P2 {
 		    
 		    my_token = my_scanner.next_token();
 		} // end while
-	System.out.println("in test file! file:" + files[i]);
         outFile.close();
     	}
+    }
+    /**
+     * testCharNums
+     *
+     * Open and read from files that have test tokens in them
+     * For each token read, confirm it increments the charNum correctly
+     */
+    private static void testCharNums() throws IOException {
+        // open input and output files
+        FileReader inFile = null;
+        PrintWriter outFile = null;
+        //add input files here
+        String[] files = {"allTokens", "stringsTestTokens"};
+        for(int i=0; i < files.length; i++){
+		try {
+		    
+		    inFile = new FileReader(files[i] + ".in");
+		} catch (FileNotFoundException ex) {
+		    System.err.println("File" + files[i] + ".in not found.");
+		    System.exit(-1);
+		}
+
+		// create and call the scanner
+		Yylex my_scanner = new Yylex(inFile);
+		int CharNumPrev = CharNum.num;
+		Symbol my_token = my_scanner.next_token();
+		
+		while (my_token.sym != sym.EOF) {
+		     switch (my_token.sym) {
+		    case sym.BOOL:
+		        if(CharNum.num != CharNumPrev + 4 && CharNum.num != 1 +4)
+		        	System.out.println("Error");
+		        break;
+		    case sym.INT:
+		        if(CharNum.num != CharNumPrev + 3 && CharNum.num != 1 +3)
+		        	System.out.println("Error");
+		        break;
+		    case sym.VOID:
+		        if(CharNum.num != CharNumPrev + 4 && CharNum.num != 1 +4)
+		        	System.out.println("Error");
+		        break;
+		    case sym.TRUE:
+		        if(CharNum.num != CharNumPrev + 4 && CharNum.num != 1 +4)
+		        	System.out.println("Error");
+		        break;
+		    case sym.FALSE:
+		        if(CharNum.num != CharNumPrev + 5 && CharNum.num != 1 +5)
+		        	System.out.println("Error");
+		        break;
+		    case sym.STRUCT:
+		        if(CharNum.num != CharNumPrev + 5 && CharNum.num != 1 +5)
+		        	System.out.println("Error");
+		        break;
+		    case sym.CIN:
+		        if(CharNum.num != CharNumPrev + 3  && CharNum.num != 1 +3)
+		        	System.out.println("Error");
+		        break;
+		    case sym.COUT:
+		        if(CharNum.num != CharNumPrev + 5 && CharNum.num != 1 +5)
+		        	System.out.println("Error");
+		        break;				
+		    case sym.IF:
+		        if(CharNum.num != CharNumPrev + 2 && CharNum.num != 1 +2)
+		        	System.out.println("Error");
+		        break;
+		    case sym.ELSE:
+		        if(CharNum.num != CharNumPrev + 4 && CharNum.num != 1 +4)
+		        	System.out.println("Error");
+		        break;
+		    case sym.WHILE:
+		        if(CharNum.num != CharNumPrev + 5 && CharNum.num != 1 +5)
+		        	System.out.println("Error");
+		        break;
+		    case sym.RETURN:
+		        if(CharNum.num != CharNumPrev + 6 && CharNum.num != 1 +6)
+		        	System.out.println("Error");
+		        break;
+		    case sym.ID:
+		    if(CharNum.num != CharNumPrev + 
+		    	(((IdTokenVal)my_token.value).idVal).length() 
+		    	&& CharNum.num != 1 + (((IdTokenVal)my_token.value).idVal).length())
+		    	 System.out.println("Error");
+		    	 
+		        //outFile.println(((IdTokenVal)my_token.value).idVal);
+		        break;
+		    case sym.INTLITERAL:  
+		        if(CharNum.num != CharNumPrev
+				+ String.valueOf(((IntLitTokenVal)my_token.value).intVal).length()
+				&& CharNum.num != 1  
+				+ String.valueOf(((IntLitTokenVal)my_token.value).intVal).length())
+				System.out.println("Error");
+		        break;
+		    case sym.STRINGLITERAL: 
+		    if(CharNum.num != CharNumPrev
+			    + (((StrLitTokenVal)my_token.value).strVal).length()
+			    && CharNum.num != 1 + (((StrLitTokenVal)my_token.value).strVal).length())
+			    System.out.println("Error");
+		        break;    
+		    case sym.LCURLY:
+		        if(CharNum.num != CharNumPrev + 1 && CharNum.num != 1 +1)
+		        	System.out.println("Error");
+		        break;
+		    case sym.RCURLY:
+		        if(CharNum.num != CharNumPrev + 1 && CharNum.num != 1 +1)
+		        	System.out.println("Error");
+		        break;
+		    case sym.LPAREN:
+		        if(CharNum.num != CharNumPrev + 1 && CharNum.num != 1 +1)
+		        	System.out.println("Error");
+		        break;
+		    case sym.RPAREN:
+		        if(CharNum.num != CharNumPrev + 1 && CharNum.num != 1 +1)
+		        	System.out.println("Error");
+		        break;
+		    case sym.SEMICOLON:
+		        if(CharNum.num != CharNumPrev + 1 && CharNum.num != 1 +1)
+		        	System.out.println("Error");
+		        break;
+		    case sym.COMMA:
+		        if(CharNum.num != CharNumPrev + 1 && CharNum.num != 1 +1)
+		        	System.out.println("Error");
+		        break;
+		    case sym.DOT:
+		        if(CharNum.num != CharNumPrev + 1 && CharNum.num != 1 +1)
+		        	System.out.println("Error");
+		        break;
+		    case sym.WRITE:
+		        if(CharNum.num != CharNumPrev + 2 && CharNum.num != 1 +2)
+		        	System.out.println("Error");
+		        break;
+		    case sym.READ:
+		         if(CharNum.num != CharNumPrev + 2 && CharNum.num != 1 +2)
+		        	System.out.println("Error");
+		        break;				
+		    case sym.PLUSPLUS:
+		         if(CharNum.num != CharNumPrev + 2 && CharNum.num != 1 +2)
+		        	System.out.println("Error");
+		        break;
+		    case sym.MINUSMINUS:
+		         if(CharNum.num != CharNumPrev + 2 && CharNum.num != 1 +2)
+		        	System.out.println("Error");
+		        break;	
+		    case sym.PLUS:
+		        if(CharNum.num != CharNumPrev + 1 && CharNum.num != 1 +1)
+		        	System.out.println("Error");
+		        break;
+		    case sym.MINUS:
+		        if(CharNum.num != CharNumPrev + 1 && CharNum.num != 1 +1)
+		        	System.out.println("Error");
+		        break;
+		    case sym.TIMES:
+		        if(CharNum.num != CharNumPrev + 1 && CharNum.num != 1 +1)
+		        	System.out.println("Error");
+		        break;
+		    case sym.DIVIDE:
+		        if(CharNum.num != CharNumPrev + 1 && CharNum.num != 1 +1)
+		        	System.out.println("Error");
+		        break;
+		    case sym.NOT:
+		        if(CharNum.num != CharNumPrev + 1 && CharNum.num != 1 +1)
+		        	System.out.println("Error");
+		        break;
+		    case sym.AND:
+		         if(CharNum.num != CharNumPrev + 2 && CharNum.num != 1 +2)
+		        	System.out.println("Error");
+		        break;
+		    case sym.OR:
+		        if(CharNum.num != CharNumPrev + 2 || CharNum.num != 1 +2)
+		        	System.out.println("Error");
+		        break;
+		    case sym.EQUALS:
+		         if(CharNum.num != CharNumPrev + 2 && CharNum.num != 1 +2)
+		        	System.out.println("Error");
+		        break;
+		    case sym.NOTEQUALS:
+		         if(CharNum.num != CharNumPrev + 2 && CharNum.num != 1 +2)
+		        	System.out.println("Error");
+		        break;
+		    case sym.LESS:
+		        if(CharNum.num != CharNumPrev + 1 && CharNum.num != 1 +1)
+		        	System.out.println("Error");
+		        break;
+		    case sym.GREATER:
+		        if(CharNum.num != CharNumPrev + 1 && CharNum.num != 1 +1)
+		        	System.out.println("Error");
+		        break;
+		    case sym.LESSEQ:
+		         if(CharNum.num != CharNumPrev + 2 && CharNum.num != 1 +2)
+		        	System.out.println("Error");
+		        break;
+		    case sym.GREATEREQ:
+		         if(CharNum.num != CharNumPrev + 2 && CharNum.num != 1 +2)
+		        	System.out.println("Error");
+		        break;
+		    case sym.ASSIGN:
+		         if(CharNum.num != CharNumPrev + 1 && CharNum.num != 1 +1)
+		        	System.out.println("Error");
+		        break;
+				default:
+					outFile.println("UNKNOWN TOKEN");
+		    }
+		    CharNumPrev = CharNum.num;
+		    my_token = my_scanner.next_token();
+		} // end while
+	}
     }
 }

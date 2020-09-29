@@ -178,7 +178,6 @@ return new Symbol(sym.EOF);
 
 \"(("\n"|"\t"|"\'"|"\\""|"\?"|(\\\\))|[^\"\\\n])*\" {	// check for good strings
 	  String Str = yytext();
-	  System.out.println("Valid Line" + Str);
 	  Symbol S = new Symbol(sym.STRINGLITERAL, new StrLitTokenVal(yyline+1, CharNum.num, Str));
 	  CharNum.num += yytext().length();
 	  return S;
