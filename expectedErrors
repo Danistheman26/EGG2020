@@ -9,4 +9,3 @@ File: stringTestTokens
 19:9 ***ERROR*** unterminated string literal ignored
 20:41 ***ERROR*** string literal with bad escaped character ignored
 File: oneLineTokens
-
