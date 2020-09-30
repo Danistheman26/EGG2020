@@ -33,10 +33,10 @@ public class P2 {
         FileReader inFile = null;
         PrintWriter outFile = null;
         //add input files here
-        String[] files = {"allTokens", "stringsTestTokens"};
+        String[] files = {"allTokens", "actualProgramTokens", "stringTestTokens", "oneLineTokens"};
         for(int i=0; i < files.length; i++){
+        	System.out.println("File: " + files[i]);
 		try {
-		    
 		    inFile = new FileReader(files[i] + ".in");
 		    outFile = new PrintWriter(new FileWriter(files[i] + ".out"));
 		} catch (FileNotFoundException ex) {

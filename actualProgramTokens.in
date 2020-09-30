@@ -1,0 +1,15 @@
+int n = 6, first = 0, second = 1, next, c = 0;
+
+while(c < n)
+{
+  if (c <= 1)
+    next = c;
+  else
+  {
+    next = first + second;
+    first = second;
+    second = next;
+  }
+  c++;
+}
+return;
