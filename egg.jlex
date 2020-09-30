@@ -54,6 +54,9 @@ class StrLitTokenVal extends TokenVal {
 class CharNum {
     static int num=1;
 }
+class CharNumPrev {
+    static int num= 1;
+}
 %%
 
 DIGIT=        [0-9]
@@ -162,7 +165,10 @@ return new Symbol(sym.EOF);
             return S;
           }
 
-\n        { CharNum.num = 1; }
+\n        { 
+		CharNum.num = 1; 
+		CharNumPrev.num = 1;
+		}
 
 ({LETTER}|"_")({LETTER}|{DIGIT}|"_")* {
 	  String ID = yytext();
@@ -171,9 +177,10 @@ return new Symbol(sym.EOF);
 	  return S;
 	}
 
-\"(("\n"|"\t"|"\'"|"\\""|"\?"|(\\\\))|[^\"\\])*[^\"]  { // check for unterminated
+\"(("\n"|"\t"|"\'"|"\\""|"\?"|(\\\\))|[^\"\\\n])*[^\"]  { // check for unterminated
 	  ErrMsg.fatal(yyline+1, CharNum.num, "unterminated string literal ignored");
-	  CharNum.num = 1;
+	  CharNum.num += yytext().length();
+	  CharNumPrev.num = 1;
 	}
 
 \"(("\n"|"\t"|"\'"|"\\""|"\?"|(\\\\))|[^\"\\\n])*\" {	// check for good strings
@@ -187,14 +194,19 @@ return new Symbol(sym.EOF);
 \"([^\"\n])*\" {
 	  ErrMsg.fatal(yyline+1, CharNum.num, "string literal with bad escaped character ignored");
 	  CharNum.num += yytext().length();
+	  CharNumPrev.num = 1;
 	}
 
 \"([^\"\n])*[^\"] {
 	  ErrMsg.fatal(yyline+1, CharNum.num, "unterminated string literal with bad escaped character ignored");
-	  CharNum.num = 1;
+	  CharNum.num += yytext().length();
+	  CharNumPrev.num = 1;
 	}
 
-{WHITESPACE}+  { CharNum.num += yytext().length(); }
+{WHITESPACE}+  { 
+		CharNum.num += yytext().length();
+		CharNumPrev.num = CharNum.num;
+		 }
 
 "+"       { Symbol S = new Symbol(sym.PLUS, new TokenVal(yyline+1, CharNum.num));
             CharNum.num++;

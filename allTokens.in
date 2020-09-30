@@ -1,17 +1,48 @@
-2019
--
-boolE
 bool
-a
-a_123
-_11adsf
+int
+void
+true
+false
+struct
+cin
+cout
+if
+else
 while
 return
-Return
+{
+}
+(
+)
+;
+,
+.
 <<
--123 + 154
+>>
 ++
+--
++
+-
+*
+/
+!
 &&
+||
+==
+!=
 <
-RETURN
-2147483650
+>
+<=
+>=
+=
+""
+"&!88"
+"use \n to denote a newline character"
+"include a quote like this \" and a backslash like this \\"
+2020
+2147483646
+-1234
+< =
+IDtoken
+two_ tokens_
+T_1 T_2
