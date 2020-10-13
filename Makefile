@@ -1,50 +1,53 @@
 ###
-# This Makefile can be used to make a scanner for the egg language
-# (Yylex.class) and to make a program that tests the scanner (P2.class).
-#
-# The default makes both the scanner and the test program.
+# This Makefile can be used to make a parser for the egg language
+# (parser.class) and to make a program (P3.class) that tests the parser and
+# the unparse methods in ast.java.
 #
 # make clean removes all generated files.
 #
-# Note: P2.java will not compile unless Yylex.class exists.
-#
 ###
 
-# define the java compiler to be used and the flags
 JC = javac
-FLAGS = -g -cp $(CP)
+FLAGS = -g  
 CP = ./deps:.
 
-P2.class: P2.java Yylex.class sym.class
-	$(JC) $(FLAGS) P2.java
+P3.class: P3.java parser.class Yylex.class ASTnode.class
+	$(JC) $(FLAGS) -cp $(CP) P3.java
 
-Yylex.class: egg.jlex.java ErrMsg.class sym.class
-	$(JC) $(FLAGS) egg.jlex.java
+parser.class: parser.java ASTnode.class Yylex.class ErrMsg.class
+	$(JC) $(FLAGS) -cp $(CP) parser.java
+
+parser.java: egg.cup
+	java -cp $(CP) java_cup.Main < egg.cup
+
+Yylex.class: egg.jlex.java sym.class ErrMsg.class
+	$(JC) $(FLAGS) -cp $(CP) egg.jlex.java
+
+ASTnode.class: ast.java
+	$(JC) $(FLAGS) -cp $(CP) ast.java
 
 egg.jlex.java: egg.jlex sym.class
 	java -cp $(CP) JLex.Main egg.jlex
 
 sym.class: sym.java
-	$(JC) $(FLAGS) sym.java
+	$(JC) $(FLAGS) -cp $(CP) sym.java
+
+sym.java: egg.cup
+	java -cp $(CP) java_cup.Main < egg.cup
 
 ErrMsg.class: ErrMsg.java
-	$(JC) $(FLAGS) ErrMsg.java
+	$(JC) $(FLAGS) -cp $(CP) ErrMsg.java
 
-	
-###
-# testing - add more here to run your tester and compare its results
-# to expected results
-###
+##test
 test:
-	java -cp $(CP) P2 > outputErrors.out 2>&1
-	diff outputErrors.out expectedErrors	
-	
-###
-# clean up
-###
+	java -cp $(CP) P3 test.egg test.out
 
+###
+# clean
+###
 clean:
-	rm -f *~ *.class egg.jlex.java
+	rm -f *~ *.class parser.java egg.jlex.java sym.java
 
+## cleantest (delete test artifacts)
 cleantest:
-	rm -f allTokens.out
+	rm -f *.out
