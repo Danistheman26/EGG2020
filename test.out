@@ -7,8 +7,10 @@ struct employee {
     int y;
     bool just;
 };
-struct employee Jim;
+void testFunc() {
+}struct employee Jim;
 int testboy(int boy, bool boolBoy, int boyToy, void death) {
+    struct e y;
     a = 25;
     boy = "bad";
     stringf = False;
@@ -18,7 +20,16 @@ int testboy(int boy, bool boolBoy, int boyToy, void death) {
     a.b.c.d = x.y.z;
     call = calls(a);
     c = a < 15;
+    c = a > b;
     y = a.b + 5;
+    y = a - c;
+    y = a.b * c.c;
+    y = a.y / y;
+    c = !b;
+    c = i != b;
+    b = c && d;
+    c = v >= d;
+    v = g <= "hahhh";
     uminus = -15;
     b = c || d;
     b++;
@@ -31,7 +42,8 @@ int testboy(int boy, bool boolBoy, int boyToy, void death) {
     return;
     AHHHHHH();
     AHHHHH2(input1input2);
-    if (thisWorks) {
+    v = ahhh();
+    if (thiswork) {
         Imma_cry = True;
     }
     if (this == this2 && that == that2) {
@@ -44,5 +56,20 @@ int testboy(int boy, bool boolBoy, int boyToy, void death) {
     } else {
         int heyy;
         this = works.yay;
+    }
+    return a;
+    return a.a;
+    return a + expression;
+    return func();
+    while (nothing.a != "yeeee") {
+        int a;
+        this = that;
+    }
+    while (this != that) {
+        that = -this;
+    }
+    repeat (blahhh) {
+        ahhhhh = function();
+        ahhhh = 1;
     }
 }

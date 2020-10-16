@@ -281,6 +281,22 @@ stmt            ::= assignExp:ae SEMICOLON
 			StmtListNode sList2 = new StmtListNode(s2);
 			RESULT = new IfElseStmtNode(e, vList1, sList1, vList2, sList2);
 		:}
+		| WHILE LPAREN exp:e RPAREN LCURLY varDeclList:v stmtList:s RCURLY
+		{:
+			DeclListNode vList = new DeclListNode(v);
+			StmtListNode sList = new StmtListNode(s);
+			RESULT = new WhileStmtNode(e, vList, sList);
+		:}
+		| REPEAT LPAREN exp:e RPAREN LCURLY varDeclList:v stmtList:s RCURLY
+		{:
+			DeclListNode vList = new DeclListNode(v);
+			StmtListNode sList = new StmtListNode(s);
+			RESULT = new RepeatStmtNode(e, vList, sList);
+		:}
+		| RETURN exp:e SEMICOLON
+		{:
+			RESULT = new ReturnStmtNode(e);
+		:}
 		| RETURN SEMICOLON
 		{:
 			RESULT = new ReturnStmtNode(null);
