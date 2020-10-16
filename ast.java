@@ -161,6 +161,17 @@ class FormalsListNode extends ASTnode {
     }
 
     public void unparse(PrintWriter p, int indent) {
+    	p.print("(");
+    	Iterator it = myFormals.iterator();
+        try {
+            while (it.hasNext()) {
+                ((FormalDeclNode)it.next()).unparse(p, indent);
+            }
+        } catch (NoSuchElementException ex) {
+            System.err.println("unexpected NoSuchElementException in FormalsListNode.print");
+            System.exit(-1);
+        }
+        p.print(") ");
     }
 
     // list of kids (FormalDeclNodes)
@@ -174,6 +185,11 @@ class FnBodyNode extends ASTnode {
     }
 
     public void unparse(PrintWriter p, int indent) {
+    p.print("{");
+    myDeclList.unparse(p, indent+1);
+    myStmtList.unparse(p, indent+1);
+    p.print("}");
+    
     }
 
     // 2 kids
@@ -187,6 +203,15 @@ class StmtListNode extends ASTnode {
     }
 
     public void unparse(PrintWriter p, int indent) {
+    	Iterator it = myStmts.iterator();
+        try {
+            while (it.hasNext()) {
+                ((StmtNode)it.next()).unparse(p, indent);
+            }
+        } catch (NoSuchElementException ex) {
+            System.err.println("unexpected NoSuchElementException in StmtListNode.print");
+            System.exit(-1);
+        }
     }
 
     // list of kids (StmtNodes)
@@ -247,6 +272,11 @@ class FnDeclNode extends DeclNode {
     }
 
     public void unparse(PrintWriter p, int indent) {
+    myType.unparse(p, indent);
+    p.print(" ");
+    myId.unparse(p, 0);
+    myFormalsList.unparse(p, 0);
+    myBody.unparse(p, 0);
     }
 
     // 4 kids
@@ -263,6 +293,8 @@ class FormalDeclNode extends DeclNode {
     }
 
     public void unparse(PrintWriter p, int indent) {
+    myType.unparse(p, 0);
+    myId.unparse(p, 0);
     }
 
     // 2 kids
@@ -273,15 +305,21 @@ class FormalDeclNode extends DeclNode {
 class StructDeclNode extends DeclNode {
     public StructDeclNode(IdNode id, DeclListNode declList) {
         myId = id;
-		myDeclList = declList;
+	myDeclList = declList;
     }
 
     public void unparse(PrintWriter p, int indent) {
+    	addIndent(p, indent);
+    	p.print("struct ");
+    	myId.unparse(p, 0);
+        p.println(" {");
+        myDeclList.unparse(p, indent+1);
+        p.println("};");
     }
 
     // 2 kids
     private IdNode myId;
-	private DeclListNode myDeclList;
+    private DeclListNode myDeclList;
 }
 
 // **********************************************************************
@@ -302,9 +340,11 @@ class IntNode extends TypeNode {
 
 class BoolNode extends TypeNode {
     public BoolNode() {
+    
     }
 
     public void unparse(PrintWriter p, int indent) {
+    	p.print("bool");
     }
 }
 
@@ -313,6 +353,7 @@ class VoidNode extends TypeNode {
     }
 
     public void unparse(PrintWriter p, int indent) {
+    	p.print("void");
     }
 }
 
@@ -322,6 +363,8 @@ class StructNode extends TypeNode {
     }
 
     public void unparse(PrintWriter p, int indent) {
+    	p.print("struct ");
+    	myId.unparse(p, 0);
     }
 	
 	// 1 kid

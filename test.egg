@@ -1,2 +1,13 @@
 int x;
 int y;
+bool booltest;
+void z;
+struct employee{
+	int x;
+	int y;
+	bool just;
+};
+struct employee Jim;
+int testboy(int boy){
+(
+}
