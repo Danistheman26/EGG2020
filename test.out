@@ -17,4 +17,8 @@ int testboy(int boy, bool boolBoy, int boyToy, void death) {
  a.c = b.x;
  a.b.c.d = x.y.z;
  call = calls(a);
+ c = a < 15;
+ y = a.b + 5;
+ uminus = -15;
+ b = c || d;
 }
