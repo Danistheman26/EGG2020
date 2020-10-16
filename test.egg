@@ -2,12 +2,22 @@ int x;
 int y;
 bool booltest;
 void z;
-struct employee{
+struct employee {
 	int x;
 	int y;
 	bool just;
 };
 struct employee Jim;
-int testboy(int boy){
-(
+int testboy(int boy, bool boolBoy, int boyToy, void death) {
+	a = 25;
+	boy = "bad";
+	stringf = False;
+	stringg = True;
+	call = calls();
+	a.c = b.x;
+	a.b.c.d = x.y.z;
+	
+	call = calls(a);
 }
+
+

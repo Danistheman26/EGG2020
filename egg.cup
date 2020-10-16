@@ -89,6 +89,12 @@ non terminal LinkedList<StmtNode>     stmtList;
 non terminal FormalsListNode  formals;
 non terminal LinkedList<FormalDeclNode> formalsList;
 non terminal FormalDeclNode   formalDecl;
+non terminal LinkedList<ExpNode> actualList;
+non terminal CallExpNode      fncall;
+non terminal ExpNode          loc;
+non terminal AssignNode       assignExp;
+non terminal ExpNode          exp;
+non terminal ExpNode          term;
 
  
 /* NOTE: Add precedence and associativity declarations here */
@@ -125,6 +131,7 @@ declList        ::= declList:dl decl:d
 
 decl            ::= varDecl:v
                 {: RESULT = v;
+                System.out.println("decl" + v);
                 :}
                 | fnDecl:f
                 {:
@@ -171,12 +178,12 @@ formals         ::= LPAREN RPAREN
 formalsList     ::= formalDecl:f
                 {:
                 LinkedList<FormalDeclNode> fList = new LinkedList<FormalDeclNode>();
-                fList.addLast(f);
+                fList.addFirst(f);
                 RESULT = fList;
                 :}
                 | formalDecl:f COMMA formalsList:fList
                 {:
-                fList.addLast(f);
+                fList.addFirst(f);
                 RESULT = fList;
                 :}
                 ;
@@ -199,28 +206,17 @@ varDeclList     ::= varDeclList:vList varDecl:v
                 ;
                 
 
-stmtList        ::= LPAREN//stmtList:sList stmt:s
-                //{:
-                //sList.addLast(v);
-                //RESULT = sList;
-                //:}
-                //| /* epsilon */
+stmtList        ::= stmtList:sList stmt:s
+                {:
+                System.out.println("stmtlist");
+                sList.addLast(s);
+                RESULT = sList;
+                :}
+                | /* epsilon */
                 {:
                 RESULT = new LinkedList<StmtNode>();
                 :}
                 ;
-                
-//stmt            ::= RETURN SEMICOLON
- //               {:
-//                RESULT = new ReturnStmtNode(new ExpNode();
-//                :}
-//                ;
-                
-//exp             ::= term:t
-//                {:
-//                RESULT = new ExpNode(t);
-//                :}
-//                ;
                 
 type            ::= INT
                 {: RESULT = new IntNode();
@@ -250,6 +246,91 @@ structBody      ::= structBody:sb varDecl:v
                 LinkedList<DeclNode> sbList = new LinkedList<DeclNode>();
                 sbList.addLast(v);
                 RESULT = sbList;
+                :}
+                ;
+                
+stmt            ::= assignExp:ae SEMICOLON
+                {:
+                System.out.println("in stmt");
+                RESULT = new AssignStmtNode(ae);
+                :}
+                ;
+                
+assignExp       ::= loc:l ASSIGN exp:e
+                {:
+                System.out.println("in assignexp");
+                RESULT = new AssignNode(l, e);
+                :}
+                ;
+                
+exp             ::= term:t
+                {:
+                RESULT = t;
+                :}
+                ;
+                
+term            ::= loc:l
+                {:
+                RESULT = l;
+                :}
+                | INTLITERAL:f
+                {:
+                RESULT = new IntLitNode(f.linenum, f.charnum, f.intVal);
+                :}
+                | STRINGLITERAL:f
+                {:
+                RESULT = new StringLitNode(f.linenum, f.charnum, f.strVal);
+                :}
+                | TRUE:f
+                {:
+                RESULT = new TrueNode(0, 0);
+                //Fix me??
+                :}
+                | FALSE:f
+                {:
+                RESULT = new FalseNode(0, 0);
+                //Fix me??
+                :}
+                | LPAREN exp:e RPAREN
+                {:
+                RESULT = e;
+                :}
+                | fncall:f
+                {:
+                RESULT = f;
+                :}
+                ;
+                
+fncall          ::=  id:i LPAREN RPAREN   // fn call with no args
+                {:
+                RESULT = new CallExpNode(i);
+                :}
+                | id:i LPAREN actualList:aList RPAREN  // with args
+                {:
+                RESULT = new CallExpNode(i, new ExpListNode(aList));
+                :}
+                ;
+                
+actualList      ::= exp:e
+                {:
+                LinkedList<ExpNode> aList = new LinkedList<ExpNode>();
+                aList.addLast(e);
+                RESULT = aList;
+                :}
+                | actualList:aList COMMA exp:e
+                {:
+                aList.addLast(e);
+                RESULT = aList;
+                :}
+                ;
+                                                
+loc             ::= id:i
+                {:
+                RESULT = i;
+                :}
+                | loc:l DOT id:i
+                {:
+                RESULT = new DotAccessExpNode(l, i);
                 :}
                 ;
 
