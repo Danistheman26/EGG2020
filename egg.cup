@@ -131,7 +131,6 @@ declList        ::= declList:dl decl:d
 
 decl            ::= varDecl:v
                 {: RESULT = v;
-                System.out.println("decl" + v);
                 :}
                 | fnDecl:f
                 {:
@@ -252,35 +251,48 @@ stmt            ::= assignExp:ae SEMICOLON
                 {:
                 	RESULT = new AssignStmtNode(ae);
                 :}
-				| loc:l PLUSPLUS SEMICOLON
-				{:
-					RESULT = new PostIncStmtNode(l);
-				:}
-				|loc:l MINUSMINUS SEMICOLON
-				{:
-					RESULT = new PostDecStmtNode(l);
-				:}
-				| CIN READ loc:l SEMICOLON
-				{:
-					RESULT = new ReadStmtNode(l);
-				:}
-				| COUT WRITE exp:l SEMICOLON
-				{:
-					RESULT = new WriteStmtNode(l);
-				:}
-				| RETURN SEMICOLON
-				{:
-					RESULT = new ReturnStmtNode(null);
-				:}
-				| fncall:l SEMICOLON
-				{:
-					RESULT = new CallStmtNode(l);
-				:}
+		| loc:l PLUSPLUS SEMICOLON
+		{:
+			RESULT = new PostIncStmtNode(l);
+		:}
+		|loc:l MINUSMINUS SEMICOLON
+		{:
+			RESULT = new PostDecStmtNode(l);
+		:}
+		| CIN READ loc:l SEMICOLON
+		{:
+			RESULT = new ReadStmtNode(l);
+		:}
+		| COUT WRITE exp:l SEMICOLON
+		{:
+			RESULT = new WriteStmtNode(l);
+		:}
+		| IF LPAREN exp:e RPAREN LCURLY varDeclList:v stmtList:s RCURLY
+		{:
+			DeclListNode vList = new DeclListNode(v); 
+			StmtListNode sList = new StmtListNode(s);
+			RESULT = new IfStmtNode(e, vList, sList);
+		:}
+		| IF LPAREN exp:e RPAREN LCURLY varDeclList:v1 stmtList:s1 RCURLY ELSE LCURLY varDeclList:v2 stmtList:s2 RCURLY
+		{:
+			DeclListNode vList1 = new DeclListNode(v1);
+			StmtListNode sList1 = new StmtListNode(s1);
+			DeclListNode vList2 = new DeclListNode(v2);
+			StmtListNode sList2 = new StmtListNode(s2);
+			RESULT = new IfElseStmtNode(e, vList1, sList1, vList2, sList2);
+		:}
+		| RETURN SEMICOLON
+		{:
+			RESULT = new ReturnStmtNode(null);
+		:}
+		| fncall:l SEMICOLON
+		{:
+			RESULT = new CallStmtNode(l);
+		:}
                 ;
                 
 assignExp       ::= loc:l ASSIGN exp:e
                 {:
-                System.out.println("in assignexp");
                 RESULT = new AssignNode(l, e);
                 :}
                 ;

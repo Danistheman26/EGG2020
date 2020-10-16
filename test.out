@@ -3,22 +3,46 @@ int y;
 bool booltest;
 void z;
 struct employee {
- int x;
- int y;
- bool just;
+    int x;
+    int y;
+    bool just;
 };
 struct employee Jim;
 int testboy(int boy, bool boolBoy, int boyToy, void death) {
- a = 25;
- boy = "bad";
- stringf = False;
- stringg = True;
- call = calls();
- a.c = b.x;
- a.b.c.d = x.y.z;
- call = calls(a);
- c = a < 15;
- y = a.b + 5;
- uminus = -15;
- b = c || d;
+    a = 25;
+    boy = "bad";
+    stringf = False;
+    stringg = True;
+    call = calls();
+    a.c = b.x;
+    a.b.c.d = x.y.z;
+    call = calls(a);
+    c = a < 15;
+    y = a.b + 5;
+    uminus = -15;
+    b = c || d;
+    b++;
+    heyyyy--;
+    a.b.c++;
+    cin >> location.placeHere;
+    cout << "A String";
+    cout << c();
+    cout << a + b - C;
+    return;
+    AHHHHHH();
+    AHHHHH2(input1input2);
+    if (thisWorks) {
+        Imma_cry = True;
+    }
+    if (this == this2 && that == that2) {
+        int Hello;
+        Hello = 5;
+        Hello++;
+    }
+    if (yadayadayada) {
+        do = this;
+    } else {
+        int heyy;
+        this = works.yay;
+    }
 }
