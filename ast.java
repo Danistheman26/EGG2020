@@ -400,6 +400,7 @@ class AssignStmtNode extends StmtNode {
 
     public void unparse(PrintWriter p, int indent) {
     	myAssign.unparse(p, indent);
+		p.println(";");
     }
 
     // 1 kid
@@ -412,6 +413,8 @@ class PostIncStmtNode extends StmtNode {
     }
 
     public void unparse(PrintWriter p, int indent) {
+		myExp.unparse(p, indent);
+		p.println("++;");
     }
 
     // 1 kid
@@ -424,6 +427,8 @@ class PostDecStmtNode extends StmtNode {
     }
 
     public void unparse(PrintWriter p, int indent) {
+		myExp.unparse(p, indent);
+		p.println("--;");
     }
 
     // 1 kid
@@ -436,6 +441,9 @@ class ReadStmtNode extends StmtNode {
     }
 
     public void unparse(PrintWriter p, int indent) {
+		p.print("cin >> ")
+		myExp.unparse(p, indent);
+		p.println(";");
     }
 
     // 1 kid (actually can only be an IdNode or an ArrayExpNode)
@@ -448,6 +456,9 @@ class WriteStmtNode extends StmtNode {
     }
 
     public void unparse(PrintWriter p, int indent) {
+		p.print("cout << ")
+		myExp.unparse(p, indent);
+		p.println(";");
     }
 
     // 1 kid
@@ -530,6 +541,8 @@ class CallStmtNode extends StmtNode {
     }
 
     public void unparse(PrintWriter p, int indent) {
+		myCall.unparse(p, indent);
+		p.println(";");
     }
 
     // 1 kid
@@ -542,6 +555,11 @@ class ReturnStmtNode extends StmtNode {
     }
 
     public void unparse(PrintWriter p, int indent) {
+		if (myExp != null) {
+			p.print("return ");
+			myExp.unparse(p, indent);
+			p.println(";");
+		} else p.print("return;");
     }
 
     // 1 kid

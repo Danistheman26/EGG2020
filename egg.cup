@@ -208,7 +208,6 @@ varDeclList     ::= varDeclList:vList varDecl:v
 
 stmtList        ::= stmtList:sList stmt:s
                 {:
-                System.out.println("stmtlist");
                 sList.addLast(s);
                 RESULT = sList;
                 :}
@@ -251,9 +250,32 @@ structBody      ::= structBody:sb varDecl:v
                 
 stmt            ::= assignExp:ae SEMICOLON
                 {:
-                System.out.println("in stmt");
-                RESULT = new AssignStmtNode(ae);
+                	RESULT = new AssignStmtNode(ae);
                 :}
+				| loc:l PLUSPLUS SEMICOLON
+				{:
+					RESULT = new PostIncStmtNode(l);
+				:}
+				|loc:l MINUSMINUS SEMICOLON
+				{:
+					RESULT = new PostDecStmtNode(l);
+				:}
+				| CIN READ loc:l SEMICOLON
+				{:
+					RESULT = new ReadStmtNode(l);
+				:}
+				| COUT WRITE exp:l SEMICOLON
+				{:
+					RESULT = new WriteStmtNode(l);
+				:}
+				| RETURN SEMICOLON
+				{:
+					RESULT = new ReturnStmtNode(null);
+				:}
+				| fncall:l SEMICOLON
+				{:
+					RESULT = new CallStmtNode(l);
+				:}
                 ;
                 
 assignExp       ::= loc:l ASSIGN exp:e
