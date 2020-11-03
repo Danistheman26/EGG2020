@@ -19,15 +19,21 @@ public class Sym {
 }
 
 class FnSym extends Sym{
-    private List<String> params;
+    private List<Sym> params;
+    private int numParams;
 
-    public FnSym(String type, List<String> params, String ID) {
+    public FnSym(String type, List<Sym> params, String ID) {
 	super(type, ID);
 	this.params = params;
+	this.numParams = params.size();
     }
 
-    public List<String> getParams() {
+    public List<Sym> getParams() {
 	return params;
+    }
+
+    public int getNumParams() {
+	return numParams;
     }
 
     public String toString() {
@@ -36,14 +42,14 @@ class FnSym extends Sym{
 }
 
 class StructDefSym extends Sym {
-    private List<String> fields;
+    private List<Sym> fields;
 
-    public StructDefSym(String type, List<String> fields, String ID) {
+    public StructDefSym(String type, List<Sym> fields, String ID) {
 	super(type, ID);
 	this.fields = fields;
     }
 
-    public List<String> getFields() {
+    public List<Sym> getFields() {
 	return fields;
     }
 
@@ -53,14 +59,14 @@ class StructDefSym extends Sym {
 }
 
 class StructSym extends Sym {
-    private List<String> params;
+    private List<Sym> params;
 
-    public StructSym(String type, List<String> params, String ID) {
+    public StructSym(String type, List<Sym> params, String ID) {
 	super(type, ID);
 	this.params = params;
     }
 
-    public List<String> getParams() {
+    public List<Sym> getParams() {
 	return params;
     }
 

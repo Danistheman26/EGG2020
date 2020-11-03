@@ -108,6 +108,7 @@ import java.util.*;
 // **********************************************************************
 
 abstract class ASTnode { 
+
     // every subclass must provide an unparse operation
     abstract public void unparse(PrintWriter p, int indent);
 
@@ -123,13 +124,15 @@ abstract class ASTnode {
 // **********************************************************************
 
 class ProgramNode extends ASTnode {
+    SymTable myStmtTable;
+
     public ProgramNode(DeclListNode L) {
         myDeclList = L;
-        SymTable myStmtTable = new SymTable();
+        myStmtTable = new SymTable();
     }
     
     public void nameAnalysis(){
-    
+    	myDeclList.nameAnalysis(myStmtTable);
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -146,7 +149,10 @@ class DeclListNode extends ASTnode {
     }
     
     public void nameAnalysis(SymTable myStmtTable){
-    
+    	Iterator it = myDecls.iterator();
+        while (it.hasNext()) {
+            ((DeclNode)it.next()).nameAnalysis(myStmtTable);
+        }
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -171,7 +177,13 @@ class FormalsListNode extends ASTnode {
     }
     
     public void nameAnalysis(SymTable myStmtTable){
-    
+	Iterator<FormalDeclNode> it = myFormals.iterator();
+        if (it.hasNext()) { // if there is at least one element
+            it.next().nameAnalysis(myStmtTable);
+            while (it.hasNext()) {  // print the rest of the list
+                it.next().nameAnalysis(myStmtTable);
+            }
+        } 
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -196,7 +208,8 @@ class FnBodyNode extends ASTnode {
     }
     
     public void nameAnalysis(SymTable myStmtTable){
-    
+    	myDeclList.nameAnalysis(myStmtTable);
+	myStmtList.nameAnalysis(myStmtTable);
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -215,7 +228,11 @@ class StmtListNode extends ASTnode {
     }
     
     public void nameAnalysis(SymTable myStmtTable){
-    
+   	Iterator<StmtNode> it = myStmts.iterator();
+        while (it.hasNext()) {
+            ((StmtNode)it.next()).nameAnalysis(myStmtTable);
+        }
+ 
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -235,7 +252,13 @@ class ExpListNode extends ASTnode {
     }
     
     public void nameAnalysis(SymTable myStmtTable){
-    
+   	Iterator<ExpNode> it = myExps.iterator();
+        if (it.hasNext()) { // if there is at least one element
+            ((ExpNode)it.next()).nameAnalysis(myStmtTable);
+            while (it.hasNext()) {  // print the rest of the list
+                ((ExpNode)it.next()).nameAnalysis(myStmtTable);
+            }
+        } 
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -258,6 +281,7 @@ class ExpListNode extends ASTnode {
 // **********************************************************************
 
 abstract class DeclNode extends ASTnode {
+	public void nameAnalysis(SymTable myStmtTable) {}
 }
 
 class VarDeclNode extends DeclNode {
@@ -268,7 +292,22 @@ class VarDeclNode extends DeclNode {
     }
     
     public void nameAnalysis(SymTable myStmtTable){
-    
+	if(myStmtTable.lookupLocal(myId.myStrVal()) == null) {
+	    System.out.println("ERROR var decl node");
+	} else {
+	    // make symbol
+	    Sym newVar = new Sym(myType.getType(), myId.myStrVal());
+
+	    // add to table
+	    try {
+	    	myStmtTable.addDecl(myId.myStrVal(), newVar);
+	    } catch (DuplicateSymException e) {
+	    } catch (EmptySymTableException f) {
+	    } catch ( WrongArgumentException g) {
+		System.out.println("FAIL");
+		System.exit(-1);
+	    }
+	}
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -299,7 +338,14 @@ class FnDeclNode extends DeclNode {
     }
     
     public void nameAnalysis(SymTable myStmtTable){
-    
+    	myStmtTable.addScope();
+        myId.nameAnalysis(myStmtTable);
+        myFormalsList.nameAnalysis(myStmtTable);
+        myBody.nameAnalysis(myStmtTable);
+	try {
+	    myStmtTable.removeScope();
+	} catch (EmptySymTableException f) {
+	}
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -328,7 +374,7 @@ class FormalDeclNode extends DeclNode {
     }
     
     public void nameAnalysis(SymTable myStmtTable){
-    
+    	
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -373,14 +419,15 @@ class StructDeclNode extends DeclNode {
 // **********************************************************************
 
 abstract class TypeNode extends ASTnode {
+    public abstract String getType();
 }
 
 class IntNode extends TypeNode {
     public IntNode() {
     }
     
-    public void getType(){
-    return "int"
+    public String getType(){
+    	return "int";
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -392,8 +439,8 @@ class BoolNode extends TypeNode {
     public BoolNode() {
     }
     
-    public void getType(){
-    return "bool"
+    public String getType(){
+    	return "bool";
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -405,8 +452,8 @@ class VoidNode extends TypeNode {
     public VoidNode() {
     }
     
-    public void getType(){
-    return "void"
+    public String getType(){
+    	return "void";
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -419,8 +466,8 @@ class StructNode extends TypeNode {
         myId = id;
     }
     
-    public void getType(){
-    return "struct"
+    public String getType(){
+    	return "struct";
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -437,6 +484,7 @@ class StructNode extends TypeNode {
 // **********************************************************************
 
 abstract class StmtNode extends ASTnode {
+    public void nameAnalysis(SymTable myStmtTable) {}
 }
 
 class AssignStmtNode extends StmtNode {
@@ -707,6 +755,7 @@ class ReturnStmtNode extends StmtNode {
 // **********************************************************************
 
 abstract class ExpNode extends ASTnode {
+    public void nameAnalysis(SymTable myStmtTable) {}
 }
 
 class IntLitNode extends ExpNode {
@@ -794,6 +843,10 @@ class IdNode extends ExpNode {
     
     public void nameAnalysis(SymTable myStmtTable){
     
+    }
+
+    public String myStrVal() {
+	return myStrVal;
     }
 
     public void unparse(PrintWriter p, int indent) {
