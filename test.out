@@ -1,2 +1,27 @@
-int i;
-bool yolo;
+int x;
+int y;
+bool booltest;
+void z;
+void testFunc() {
+}
+
+int testboy(int boy, bool boolBoy, int boyToy, void death) {
+    int yolo2;
+    yolo2(int) = 12345;
+    boy(int) = "bad";
+    boolBoy(bool) = true;
+    booltest(bool) = false;
+}
+
+int f(int x, bool b) {
+}
+
+void g() {
+    int a;
+    bool b;
+    x(int) = a(int);
+    b(bool) = (a(int) == 3);
+    f((a + (y * 2)), b);
+    g();
+}
+

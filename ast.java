@@ -292,7 +292,7 @@ class VarDeclNode extends DeclNode {
     }
     
     public void nameAnalysis(SymTable myStmtTable){
-	if(myStmtTable.lookupLocal(myId.myStrVal()) == null) {
+	if(myStmtTable.lookupLocal(myId.myStrVal()) != null) {
 	    System.out.println("ERROR var decl node");
 	} else {
 	    // make symbol
@@ -339,7 +339,7 @@ class FnDeclNode extends DeclNode {
     
     public void nameAnalysis(SymTable myStmtTable){
 		// first check if this function already exists in the symbol table before creating it
-		if(myStmtTable.lookupLocal(myId.myStrVal()) == null) {
+		if(myStmtTable.lookupLocal(myId.myStrVal()) != null) {
 			System.out.println("ERROR function decl node");
 		} else {
 			// make symbol
@@ -392,7 +392,7 @@ class FormalDeclNode extends DeclNode {
     }
     
     public void nameAnalysis(SymTable myStmtTable){
-    	if(myStmtTable.lookupLocal(myId.myStrVal()) == null) {
+    	if(myStmtTable.lookupLocal(myId.myStrVal()) != null) {
 			System.out.println("ERROR formal decl node");
 		} else {
 			// make symbol
@@ -949,7 +949,7 @@ class IdNode extends ExpNode {
 			mySym = myStmtTable.lookupLocal(myStrVal);
 			// add a link to the table
 		} else if(myStmtTable.lookupGlobal(myStrVal) != null) {
-			mySym = myStmtTable.lookupLocal(myStrVal);
+			mySym = myStmtTable.lookupGlobal(myStrVal);
 			// add a link to the table in that scope
 		} else {
 			System.out.println("Undeclared identifier");
@@ -962,7 +962,8 @@ class IdNode extends ExpNode {
 
     public void unparse(PrintWriter p, int indent) {
         p.print(myStrVal);
-        p.print("(" + mySym.toString() + ")");
+	if (mySym != null)
+            p.print("(" + mySym.toString() + ")");
     }
 
     private int myLineNum;
