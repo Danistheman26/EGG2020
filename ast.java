@@ -379,8 +379,8 @@ class IntNode extends TypeNode {
     public IntNode() {
     }
     
-    public void nameAnalysis(SymTable myStmtTable){
-    
+    public void getType(){
+    return "int"
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -392,8 +392,8 @@ class BoolNode extends TypeNode {
     public BoolNode() {
     }
     
-    public void nameAnalysis(SymTable myStmtTable){
-    
+    public void getType(){
+    return "bool"
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -405,8 +405,8 @@ class VoidNode extends TypeNode {
     public VoidNode() {
     }
     
-    public void nameAnalysis(SymTable myStmtTable){
-    
+    public void getType(){
+    return "void"
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -419,8 +419,8 @@ class StructNode extends TypeNode {
         myId = id;
     }
     
-    public void nameAnalysis(SymTable myStmtTable){
-    
+    public void getType(){
+    return "struct"
     }
 
     public void unparse(PrintWriter p, int indent) {
