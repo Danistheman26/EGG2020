@@ -946,8 +946,10 @@ class IdNode extends ExpNode {
     public void nameAnalysis(SymTable myStmtTable){
 		// we need to check if this ID was found anywhere in the SymTable otherwise print Undeclared identifier
 		if(myStmtTable.lookupLocal(myStrVal) != null) {
+			mySym = myStmtTable.lookupLocal(myStrVal);
 			// add a link to the table
 		} else if(myStmtTable.lookupGlobal(myStrVal) != null) {
+			mySym = myStmtTable.lookupLocal(myStrVal);
 			// add a link to the table in that scope
 		} else {
 			System.out.println("Undeclared identifier");
@@ -960,11 +962,13 @@ class IdNode extends ExpNode {
 
     public void unparse(PrintWriter p, int indent) {
         p.print(myStrVal);
+        p.print("(" + mySym.toString() + ")");
     }
 
     private int myLineNum;
     private int myCharNum;
     private String myStrVal;
+    private Sym mySym;
 }
 
 class DotAccessExpNode extends ExpNode {
