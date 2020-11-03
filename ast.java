@@ -1031,6 +1031,10 @@ class CallExpNode extends ExpNode {
     
     public void nameAnalysis(SymTable myStmtTable){
 		// FIXME, not sure what this is, probably calling a function?
+	myId.nameAnalysis(myStmtTable);
+        if (myExpList != null) {
+            myExpList.nameAnalysis(myStmtTable);
+        }
     }
 
     // ** unparse **

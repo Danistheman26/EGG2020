@@ -21,7 +21,7 @@ void g() {
     bool b;
     x(int) = a(int);
     b(bool) = (a(int) == 3);
-    f((a + (y * 2)), b);
-    g();
+    f(int)((a(int) + (y(int) * 2)), b(bool));
+    g(void)();
 }
 
