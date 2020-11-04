@@ -19,42 +19,28 @@ public class Sym {
 }
 
 class FnSym extends Sym{
-    private List<Sym> params;
-    private int numParams;
+    private SymTable params;
 
-    public FnSym(String type, List<Sym> params, String ID) {
+    public FnSym(String type, SymTable params, String ID) {
 	super(type, ID);
 	this.params = params;
-	this.numParams = params.size();
     }
 
-    public List<Sym> getParams() {
+    public SymTable getParams() {
 	return params;
-    }
-
-    public int getNumParams() {
-	return numParams;
-    }
-
-    public String toString() {
-	return "FIXME";
     }
 }
 
 class StructDefSym extends Sym {
-    private List<Sym> fields;
+    private SymTable fields;
 
-    public StructDefSym(String type, List<Sym> fields, String ID) {
+    public StructDefSym(String type, SymTable fields, String ID) {
 	super(type, ID);
 	this.fields = fields;
     }
 
-    public List<Sym> getFields() {
+    public SymTable getFields() {
 	return fields;
-    }
-
-    public String toString() {
-	return "FIXME";
     }
 }
 

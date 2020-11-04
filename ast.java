@@ -342,7 +342,10 @@ class FnDeclNode extends DeclNode {
 		if(myStmtTable.lookupLocal(myId.myStrVal()) != null) {
 			System.out.println("ERROR function decl node");
 		} else {
-			// make symbol
+			// make internal symbol table of formals list
+			SymTable formalsList = new SymTable();
+			myFormalsList.nameAnalysis(formalsList);
+
 			Sym newVar = new Sym(myType.getType(), myId.myStrVal());
 
 			// add to table
@@ -429,24 +432,24 @@ class StructDeclNode extends DeclNode {
     
     public void nameAnalysis(SymTable myStmtTable){
 		// check if already in the statement table
-		// if(myStmtTable.lookupLocal(myId.myStrVal()) == null) {
-			// System.out.println("ERROR struct decl node");
-		// } else {
-			//make symbol
-			// Sym newVar = new Sym(myType.getType(), myId.myStrVal());
+		if(myStmtTable.lookupLocal(myId.myStrVal()) != null) {
+		     System.out.println("ERROR struct decl node");
+		} else {
+			// make internal symbol table and add fields to it
+			SymTable declList = new SymTable();
+			myDeclList.nameAnalysis(declList);
+			Sym newVar = new StructDefSym("struct", declList, myId.myStrVal());
 
-			//add to table
-			// try {
-				// myStmtTable.addDecl(myId.myStrVal(), newVar);
-			// } catch (DuplicateSymException e) {
-			// } catch (EmptySymTableException f) {
-			// } catch ( WrongArgumentException g) {
-			// System.out.println("FAIL");
-			// System.exit(-1);
-			// }
-		// }
-		
-		// then add its sub fields.. this might be more difficult than expected
+			// add to table
+			try {
+			    myStmtTable.addDecl(myId.myStrVal(), newVar);
+			} catch (DuplicateSymException e) {
+			} catch (EmptySymTableException f) {
+			} catch ( WrongArgumentException g) {
+			    System.out.println("FAIL");
+			    System.exit(-1);
+			}
+		}
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -978,7 +981,7 @@ class DotAccessExpNode extends ExpNode {
     }
     
     public void nameAnalysis(SymTable myStmtTable){
-		// not sure how we will go about this section, might be tough tbh
+	
     }
 
     public void unparse(PrintWriter p, int indent) {

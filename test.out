@@ -2,11 +2,17 @@ int x;
 int y;
 bool booltest;
 void z;
+struct DANIELKOCHIII{
+    int i;
+    bool yup;
+};
+
 void testFunc() {
 }
 
 int testboy(int boy, bool boolBoy, int boyToy, void death) {
     int yolo2;
+    struct DANIELKOCHII p;
     yolo2(int) = 12345;
     boy(int) = "bad";
     boolBoy(bool) = true;
