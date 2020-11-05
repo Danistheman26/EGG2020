@@ -45,18 +45,14 @@ class StructDefSym extends Sym {
 }
 
 class StructSym extends Sym {
-    private List<Sym> params;
+    private SymTable params;
 
-    public StructSym(String type, List<Sym> params, String ID) {
+    public StructSym(String type, SymTable params, String ID) {
 	super(type, ID);
 	this.params = params;
     }
 
-    public List<Sym> getParams() {
+    public SymTable getParams() {
 	return params;
-    }
-
-    public String toString() {
-	return "FIXME";
     }
 }

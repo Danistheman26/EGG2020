@@ -15,8 +15,11 @@ int testboy(int boy, bool boolBoy, int boyToy, void death) {
 
 	int yolo2;
 
-	struct DANIELKOCHII p;
+	struct DANIELKOCHIII p;
 
+	struct DANIELKOCHIII asdf;
+
+	p.i = 3;
 	yolo2 = 12345;
 
 	boy = "bad";

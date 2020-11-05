@@ -294,9 +294,20 @@ class VarDeclNode extends DeclNode {
     public void nameAnalysis(SymTable myStmtTable){
 	if(myStmtTable.lookupLocal(myId.myStrVal()) != null) {
 	    System.out.println("ERROR var decl node");
+	    if (mySize == 0 && myStmtTable.lookupGlobal(((StructNode)myType).getID()) == null) {
+		System.out.println("Invalid name of struct type");
+	    }
+	} else if (mySize == 0 && myStmtTable.lookupGlobal(((StructNode)myType).getID()) == null) {
+		System.out.println("Invalid name of struct type");
 	} else {
 	    // make symbol
-	    Sym newVar = new Sym(myType.getType(), myId.myStrVal());
+	    Sym newVar;
+	    if (mySize == 0) {
+		SymTable yee = ((StructDefSym)myStmtTable.lookupGlobal(((StructNode)myType).getID())).getFields();
+		newVar = new StructSym(((StructNode)myType).getID(), yee, myId.myStrVal());
+	    } else {
+	        newVar = new Sym(myType.getType(), myId.myStrVal());
+	    }
 
 	    // add to table
 	    try {
@@ -438,7 +449,7 @@ class StructDeclNode extends DeclNode {
 			// make internal symbol table and add fields to it
 			SymTable declList = new SymTable();
 			myDeclList.nameAnalysis(declList);
-			Sym newVar = new StructDefSym("struct", declList, myId.myStrVal());
+			StructDefSym newVar = new StructDefSym("struct", declList, myId.myStrVal());
 
 			// add to table
 			try {
@@ -522,6 +533,10 @@ class StructNode extends TypeNode {
     
     public String getType(){
     	return "struct";
+    }
+
+    public String getID() {
+	return myId.myStrVal();
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -981,7 +996,19 @@ class DotAccessExpNode extends ExpNode {
     }
     
     public void nameAnalysis(SymTable myStmtTable){
-	
+	// Should we add a method to 3 types of exp nodes?
+
+	// check if the LHS is a valid Exp
+	// myLoc.nameAnalysis();
+
+	// check if it is a struct
+	//if (!myLoc.IS A STRUCT)
+		//print error
+
+	// find myLoc in the Symbol Table
+	//SymTable InStruct = myLoc.getFields();
+
+    	//myId.nameAnalysis(InStruct);
     }
 
     public void unparse(PrintWriter p, int indent) {
