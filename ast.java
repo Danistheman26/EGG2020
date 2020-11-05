@@ -292,14 +292,22 @@ class VarDeclNode extends DeclNode {
     }
     
     public void nameAnalysis(SymTable myStmtTable){
+    	boolean makeSym = true;
+    	if(myType.getType().equals("void")){
+    		makeSym = false;
+		ErrMsg.fatal(myId.myLineNum(), myId.myCharNum(), "Non-function declared void");
+	}
 	if(myStmtTable.lookupLocal(myId.myStrVal()) != null) {
-	    System.out.println("ERROR var decl node");
-	    if (mySize == 0 && myStmtTable.lookupGlobal(((StructNode)myType).getID()) == null) {
-		System.out.println("Invalid name of struct type");
-	    }
-	} else if (mySize == 0 && myStmtTable.lookupGlobal(((StructNode)myType).getID()) == null) {
-		System.out.println("Invalid name of struct type");
-	} else {
+		makeSym = false;
+	   	ErrMsg.fatal(myId.myLineNum(), myId.myCharNum(), "Multiply declared identifier");
+	}
+	if (mySize == 0 
+	&& (myStmtTable.lookupGlobal(((StructNode)myType).getID()) == null 
+	|| !myStmtTable.lookupGlobal(((StructNode)myType).getID()).getType().equals("struct"))) {
+	makeSym = false;
+		ErrMsg.fatal(myId.myLineNum(), myId.myCharNum(), "Invalid name of struct type");
+	}
+	if(makeSym) {
 	    // make symbol
 	    Sym newVar;
 	    if (mySize == 0) {
@@ -312,10 +320,8 @@ class VarDeclNode extends DeclNode {
 	    // add to table
 	    try {
 	    	myStmtTable.addDecl(myId.myStrVal(), newVar);
-	    } catch (DuplicateSymException e) {
-	    } catch (EmptySymTableException f) {
-	    } catch ( WrongArgumentException g) {
-		System.out.println("FAIL");
+	    } catch (Exception e) {
+		System.err.println(e);
 		System.exit(-1);
 	    }
 	}
@@ -351,7 +357,7 @@ class FnDeclNode extends DeclNode {
     public void nameAnalysis(SymTable myStmtTable){
 		// first check if this function already exists in the symbol table before creating it
 		if(myStmtTable.lookupLocal(myId.myStrVal()) != null) {
-			System.out.println("ERROR function decl node");
+			ErrMsg.fatal(myId.myLineNum(), myId.myCharNum(), "Multiply declared identifier");
 		} else {
 			// make internal symbol table of formals list
 			SymTable formalsList = new SymTable();
@@ -362,12 +368,10 @@ class FnDeclNode extends DeclNode {
 			// add to table
 			try {
 				myStmtTable.addDecl(myId.myStrVal(), newVar);
-			} catch (DuplicateSymException e) {
-			} catch (EmptySymTableException f) {
-			} catch ( WrongArgumentException g) {
-			System.out.println("FAIL");
-			System.exit(-1);
-			}
+			} catch (Exception e) {
+				System.err.println(e);
+				System.exit(-1);
+	    }
 		}
 		
 		// then unparse its formals and body inside a new scope
@@ -376,7 +380,9 @@ class FnDeclNode extends DeclNode {
         myBody.nameAnalysis(myStmtTable);
 		try {
 			myStmtTable.removeScope();
-		} catch (EmptySymTableException f) {
+		} catch (Exception e) {
+			System.err.println(e);
+			System.exit(-1);
 		}
     }
 
@@ -407,7 +413,7 @@ class FormalDeclNode extends DeclNode {
     
     public void nameAnalysis(SymTable myStmtTable){
     	if(myStmtTable.lookupLocal(myId.myStrVal()) != null) {
-			System.out.println("ERROR formal decl node");
+			ErrMsg.fatal(myId.myLineNum(), myId.myCharNum(), "Multiply declared identifier");
 		} else {
 			// make symbol
 			Sym newVar = new Sym(myType.getType(), myId.myStrVal());
@@ -415,12 +421,10 @@ class FormalDeclNode extends DeclNode {
 			// add to table
 			try {
 				myStmtTable.addDecl(myId.myStrVal(), newVar);
-			} catch (DuplicateSymException e) {
-			} catch (EmptySymTableException f) {
-			} catch ( WrongArgumentException g) {
-			System.out.println("FAIL");
-			System.exit(-1);
-			}
+			} catch (Exception e) {
+				System.err.println(e);
+				System.exit(-1);
+	    }
 		}
     }
 
@@ -444,7 +448,7 @@ class StructDeclNode extends DeclNode {
     public void nameAnalysis(SymTable myStmtTable){
 		// check if already in the statement table
 		if(myStmtTable.lookupLocal(myId.myStrVal()) != null) {
-		     System.out.println("ERROR struct decl node");
+		     ErrMsg.fatal(myId.myLineNum(), myId.myCharNum(), "Multiply declared identifier");
 		} else {
 			// make internal symbol table and add fields to it
 			SymTable declList = new SymTable();
@@ -454,12 +458,10 @@ class StructDeclNode extends DeclNode {
 			// add to table
 			try {
 			    myStmtTable.addDecl(myId.myStrVal(), newVar);
-			} catch (DuplicateSymException e) {
-			} catch (EmptySymTableException f) {
-			} catch ( WrongArgumentException g) {
-			    System.out.println("FAIL");
-			    System.exit(-1);
-			}
+			} catch (Exception e) {
+				System.err.println(e);
+				System.exit(-1);
+	    }
 		}
     }
 
@@ -969,13 +971,21 @@ class IdNode extends ExpNode {
 			mySym = myStmtTable.lookupGlobal(myStrVal);
 			// add a link to the table in that scope
 		} else {
-			System.out.println("Undeclared identifier");
+			ErrMsg.fatal(myLineNum, myCharNum, "Undeclared identifier");
 		}
     }
 
     public String myStrVal() {
 	return myStrVal;
     }
+    public int myLineNum(){
+    	return myLineNum;
+    }
+    
+    public int myCharNum(){
+    	return myCharNum;
+    }
+    
 
     public void unparse(PrintWriter p, int indent) {
         p.print(myStrVal);
