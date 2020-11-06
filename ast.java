@@ -318,6 +318,8 @@ class VarDeclNode extends DeclNode {
 	if (mySize == 0){
 		
 		if(myStmtTable.lookupGlobal(((StructNode)myType).getID()) == null){
+			makeSym = false;
+			ErrMsg.fatal(myId.myLineNum(), myId.myCharNum(), "Invalid name of struct type");
 			}
 		else if(!myStmtTable.lookupGlobal(((StructNode)myType).getID()).getType().equals("struct")){
 			makeSym = false;
@@ -357,6 +359,8 @@ class VarDeclNode extends DeclNode {
 	if (mySize == 0){
 		
 		if(myStmtTable.lookupGlobal(((StructNode)myType).getID()) == null){
+			makeSym = false;
+			ErrMsg.fatal(myId.myLineNum(), myId.myCharNum(), "Invalid name of struct type");
 			}
 		else if(!myStmtTable.lookupGlobal(((StructNode)myType).getID()).getType().equals("struct")){
 			makeSym = false;
@@ -721,9 +725,9 @@ class IfStmtNode extends StmtNode {
     }
     
     public void nameAnalysis(SymTable myStmtTable){
-		// check if valid if statement inputs
-		myExp.nameAnalysis(myStmtTable);
-		// then unparse its formals and body inside a new scope
+	// check if valid if statement inputs
+	myExp.nameAnalysis(myStmtTable);
+	// then unparse its formals and body inside a new scope
     	myStmtTable.addScope();
         myDeclList.nameAnalysis(myStmtTable);
         myStmtList.nameAnalysis(myStmtTable);
@@ -818,9 +822,9 @@ class WhileStmtNode extends StmtNode {
     }
     
     public void nameAnalysis(SymTable myStmtTable){
-		// check if valid if statement inputs
-		myExp.nameAnalysis(myStmtTable);
-		// then unparse its formals and body inside a new scope
+	// check if valid if statement inputs
+	myExp.nameAnalysis(myStmtTable);
+	// then unparse its formals and body inside a new scope
     	myStmtTable.addScope();
         myDeclList.nameAnalysis(myStmtTable);
         myStmtList.nameAnalysis(myStmtTable);
@@ -855,9 +859,9 @@ class RepeatStmtNode extends StmtNode {
     }
     
     public void nameAnalysis(SymTable myStmtTable){
-		// check if valid if statement inputs
-		myExp.nameAnalysis(myStmtTable);
-		// then unparse its formals and body inside a new scope
+	// check if valid if statement inputs
+	myExp.nameAnalysis(myStmtTable);
+	// then unparse its formals and body inside a new scope
     	myStmtTable.addScope();
         myDeclList.nameAnalysis(myStmtTable);
         myStmtList.nameAnalysis(myStmtTable);
@@ -1060,56 +1064,46 @@ class IdNode extends ExpNode {
     private String myStrVal;
     private Sym mySym;
 }
-//public struct p();
-//p().y     DotAccessExpNode, idNode
 class DotAccessExpNode extends ExpNode {
     public DotAccessExpNode(ExpNode loc, IdNode id) {
         myLoc = loc;    
         myId = id;
     }
     public void nameAnalysis(SymTable myStmtTable){
-	// Should we add a method to 3 types of exp nodes?
-	// check if the LHS is a valid ExpNode
 	myLoc.nameAnalysis(myStmtTable);
 	if(myLoc instanceof IdNode){
-	 	if(((IdNode)myLoc).getSym().getType().equals((myStmtTable.lookupGlobal(((IdNode)myLoc).myStrVal())).getType())){
-	 		myId.nameAnalysis(((StructSym)myStmtTable.lookupGlobal(((IdNode)myLoc).myStrVal())).getParams());
+		 if(((IdNode)myLoc).getSym() != null 
+		 &&((IdNode)myLoc).getSym().getType().equals((myStmtTable.lookupGlobal(((IdNode)myLoc).myStrVal())).getType())){
+		 	myId.nameAnalysis(((StructSym)myStmtTable.lookupGlobal(((IdNode)myLoc).myStrVal())).getParams());
 			SymTable inStruct = ((StructSym)myStmtTable.lookupGlobal(((IdNode)myLoc).myStrVal())).getParams();
 			if(inStruct.lookupLocal(myId.myStrVal()) == null){
-				ErrMsg.fatal(myId.myLineNum(), myId.myCharNum(), "Invalid struct field name1" + myId.myStrVal());
+				ErrMsg.fatal(myId.myLineNum(), myId.myCharNum(), "Invalid struct field name");
 			}
 		}
 		else{
-			ErrMsg.fatal(((IdNode)myLoc).myLineNum(), ((IdNode)myLoc).myCharNum(), "Dot-access of non-struct type1");
+			ErrMsg.fatal(((IdNode)myLoc).myLineNum(), ((IdNode)myLoc).myCharNum(), "Dot-access of non-struct type");
 		}
 		
 	}else{
 	
 		
 		IdNode locId = ((DotAccessExpNode)myLoc).getId();
-		SymTable myLocTable = ((StructSym)locId.getSym()).getParams();
-		myId.nameAnalysis(myLocTable);
-		//fails here because it can't see Global symbol table
-		
-		if(myStmtTable.lookupGlobal(((IdNode)locId).getSym().getType()) != null){
-			SymTable inStruct = myLocTable;
-			if(inStruct.lookupLocal(myId.myStrVal()) == null){
-				ErrMsg.fatal(myId.myLineNum(), myId.myCharNum(), "Invalid struct field name2" + myId);
+		if ((StructSym)locId.getSym() != null){
+			SymTable myLocTable = ((StructSym)locId.getSym()).getParams();
+			myId.nameAnalysis(myLocTable);			
+			if(myStmtTable.lookupGlobal(((IdNode)locId).getSym().getType()) != null){
+				SymTable inStruct = myLocTable;
+				if(inStruct.lookupLocal(myId.myStrVal()) == null){
+					ErrMsg.fatal(myId.myLineNum(), myId.myCharNum(), "Invalid struct field name");
+				}
 			}
-		}
-		else{
-			ErrMsg.fatal(locId.myLineNum(), locId.myCharNum(), "Dot-access of non-struct type2");
+			else{
+				ErrMsg.fatal(locId.myLineNum(), locId.myCharNum(), "Dot-access of non-struct type");
+			}
+		}else{
+			ErrMsg.fatal(locId.myLineNum(), locId.myCharNum(), "Dot-access of non-struct type");
 		}
 	}
-
-	// check if it is a struct
-	//if (!myLoc.IS A STRUCT)
-		//print error
-
-	// find myLoc in the Symbol Table
-	//SymTable InStruct = myLoc.getFields();
-
-    	//myId.nameAnalysis(InStruct);
     }
     
 

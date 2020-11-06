@@ -11,6 +11,11 @@ struct DANIELKOCHIII{
     bool yup;
 };
 
+struct PARTNERS{
+    struct DANIELKOCHIII dan;
+    int frick;
+};
+
 void pause() {
 }
 
@@ -19,8 +24,10 @@ int testboy(int boy, bool boolBoy, int boyToy, void death) {
     struct DANIELKOCHIII p;
     struct DANIELKOCHIII asdf;
     struct JAKETHALIII jaketest;
+    struct PARTNERS part;
     (p(DANIELKOCHIII)).i(int) = 3;
     ((p(DANIELKOCHIII)).jake(JAKETHALIII)).j(int) = 4;
+    (((part(PARTNERS)).dan(DANIELKOCHIII)).jake(JAKETHALIII)).j(int) = 69;
     yolo2(int) = 12345;
     boy(int) = "bad";
     boolBoy(bool) = true;
