@@ -1,14 +1,18 @@
 int x;
 int y;
 bool booltest;
-void z;
-void DANIELKOCHIII;
+struct JAKETHALIII {
+	int j;
+};
 struct DANIELKOCHIII {
+	struct JAKETHALIII jake;
 	int i;
-	bool yup;
+	bool yup;	
 };
 
-void testFunc() {
+
+
+void pause(){
 }
 
 int testboy(int boy, bool boolBoy, int boyToy, void death) {
@@ -18,8 +22,10 @@ int testboy(int boy, bool boolBoy, int boyToy, void death) {
 	struct DANIELKOCHIII p;
 
 	struct DANIELKOCHIII asdf;
+	struct JAKETHALIII jaketest;
 
 	p.i = 3;
+	p.jake.j = 4;
 	yolo2 = 12345;
 
 	boy = "bad";

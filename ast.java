@@ -154,6 +154,20 @@ class DeclListNode extends ASTnode {
             ((DeclNode)it.next()).nameAnalysis(myStmtTable);
         }
     }
+    
+    public void nameAnalysis(SymTable myStmtTable, SymTable structSymTable){
+    	Iterator it = myDecls.iterator();
+    	Iterator it2 = myDecls.iterator();
+        while (it.hasNext()) {
+        	
+        	DeclNode next = (DeclNode)it.next();
+        	if(next instanceof VarDeclNode){
+            		((VarDeclNode)next).nameAnalysis(myStmtTable, structSymTable);
+            	}else{
+            		((DeclNode)next).nameAnalysis(myStmtTable);
+            	}
+        }
+    }
 
     public void unparse(PrintWriter p, int indent) {
         Iterator it = myDecls.iterator();
@@ -301,11 +315,14 @@ class VarDeclNode extends DeclNode {
 		makeSym = false;
 	   	ErrMsg.fatal(myId.myLineNum(), myId.myCharNum(), "Multiply declared identifier");
 	}
-	if (mySize == 0 
-	&& (myStmtTable.lookupGlobal(((StructNode)myType).getID()) == null 
-	|| !myStmtTable.lookupGlobal(((StructNode)myType).getID()).getType().equals("struct"))) {
-	makeSym = false;
-		ErrMsg.fatal(myId.myLineNum(), myId.myCharNum(), "Invalid name of struct type");
+	if (mySize == 0){
+		
+		if(myStmtTable.lookupGlobal(((StructNode)myType).getID()) == null){
+			}
+		else if(!myStmtTable.lookupGlobal(((StructNode)myType).getID()).getType().equals("struct")){
+			makeSym = false;
+			ErrMsg.fatal(myId.myLineNum(), myId.myCharNum(), "Invalid name of struct type");
+		}
 	}
 	if(makeSym) {
 	    // make symbol
@@ -320,6 +337,45 @@ class VarDeclNode extends DeclNode {
 	    // add to table
 	    try {
 	    	myStmtTable.addDecl(myId.myStrVal(), newVar);
+	    } catch (Exception e) {
+		System.err.println(e);
+		System.exit(-1);
+	    }
+	}
+    }
+    
+    public void nameAnalysis(SymTable myStmtTable, SymTable structStmtTable){
+    	boolean makeSym = true;
+    	if(myType.getType().equals("void")){
+    		makeSym = false;
+		ErrMsg.fatal(myId.myLineNum(), myId.myCharNum(), "Non-function declared void");
+	}
+	if(structStmtTable.lookupLocal(myId.myStrVal()) != null) {
+		makeSym = false;
+	   	ErrMsg.fatal(myId.myLineNum(), myId.myCharNum(), "Multiply declared identifier");
+	}
+	if (mySize == 0){
+		
+		if(myStmtTable.lookupGlobal(((StructNode)myType).getID()) == null){
+			}
+		else if(!myStmtTable.lookupGlobal(((StructNode)myType).getID()).getType().equals("struct")){
+			makeSym = false;
+			ErrMsg.fatal(myId.myLineNum(), myId.myCharNum(), "Invalid name of struct type");
+		}
+	}
+	if(makeSym) {
+	    // make symbol
+	    Sym newVar;
+	    if (mySize == 0) {
+		SymTable yee = ((StructDefSym)myStmtTable.lookupGlobal(((StructNode)myType).getID())).getFields();
+		newVar = new StructSym(((StructNode)myType).getID(), yee, myId.myStrVal());
+	    } else {
+	        newVar = new Sym(myType.getType(), myId.myStrVal());
+	    }
+
+	    // add to table
+	    try {
+	    	structStmtTable.addDecl(myId.myStrVal(), newVar);
 	    } catch (Exception e) {
 		System.err.println(e);
 		System.exit(-1);
@@ -452,7 +508,8 @@ class StructDeclNode extends DeclNode {
 		} else {
 			// make internal symbol table and add fields to it
 			SymTable declList = new SymTable();
-			myDeclList.nameAnalysis(declList);
+			
+			myDeclList.nameAnalysis(myStmtTable, declList);
 			StructDefSym newVar = new StructDefSym("struct", declList, myId.myStrVal());
 
 			// add to table
@@ -461,8 +518,8 @@ class StructDeclNode extends DeclNode {
 			} catch (Exception e) {
 				System.err.println(e);
 				System.exit(-1);
-	    }
-		}
+			}
+	}
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -974,6 +1031,8 @@ class IdNode extends ExpNode {
 			ErrMsg.fatal(myLineNum, myCharNum, "Undeclared identifier");
 		}
     }
+    
+    
 
     public String myStrVal() {
 	return myStrVal;
@@ -984,6 +1043,9 @@ class IdNode extends ExpNode {
     
     public int myCharNum(){
     	return myCharNum;
+    }
+    public Sym getSym(){
+    	return mySym;
     }
     
 
@@ -998,18 +1060,47 @@ class IdNode extends ExpNode {
     private String myStrVal;
     private Sym mySym;
 }
-
+//public struct p();
+//p().y     DotAccessExpNode, idNode
 class DotAccessExpNode extends ExpNode {
     public DotAccessExpNode(ExpNode loc, IdNode id) {
         myLoc = loc;    
         myId = id;
     }
-    
     public void nameAnalysis(SymTable myStmtTable){
 	// Should we add a method to 3 types of exp nodes?
-
-	// check if the LHS is a valid Exp
-	// myLoc.nameAnalysis();
+	// check if the LHS is a valid ExpNode
+	myLoc.nameAnalysis(myStmtTable);
+	if(myLoc instanceof IdNode){
+	 	if(((IdNode)myLoc).getSym().getType().equals((myStmtTable.lookupGlobal(((IdNode)myLoc).myStrVal())).getType())){
+	 		myId.nameAnalysis(((StructSym)myStmtTable.lookupGlobal(((IdNode)myLoc).myStrVal())).getParams());
+			SymTable inStruct = ((StructSym)myStmtTable.lookupGlobal(((IdNode)myLoc).myStrVal())).getParams();
+			if(inStruct.lookupLocal(myId.myStrVal()) == null){
+				ErrMsg.fatal(myId.myLineNum(), myId.myCharNum(), "Invalid struct field name1" + myId.myStrVal());
+			}
+		}
+		else{
+			ErrMsg.fatal(((IdNode)myLoc).myLineNum(), ((IdNode)myLoc).myCharNum(), "Dot-access of non-struct type1");
+		}
+		
+	}else{
+	
+		
+		IdNode locId = ((DotAccessExpNode)myLoc).getId();
+		SymTable myLocTable = ((StructSym)locId.getSym()).getParams();
+		myId.nameAnalysis(myLocTable);
+		//fails here because it can't see Global symbol table
+		
+		if(myStmtTable.lookupGlobal(((IdNode)locId).getSym().getType()) != null){
+			SymTable inStruct = myLocTable;
+			if(inStruct.lookupLocal(myId.myStrVal()) == null){
+				ErrMsg.fatal(myId.myLineNum(), myId.myCharNum(), "Invalid struct field name2" + myId);
+			}
+		}
+		else{
+			ErrMsg.fatal(locId.myLineNum(), locId.myCharNum(), "Dot-access of non-struct type2");
+		}
+	}
 
 	// check if it is a struct
 	//if (!myLoc.IS A STRUCT)
@@ -1020,6 +1111,8 @@ class DotAccessExpNode extends ExpNode {
 
     	//myId.nameAnalysis(InStruct);
     }
+    
+
 
     public void unparse(PrintWriter p, int indent) {
         p.print("(");
@@ -1027,7 +1120,10 @@ class DotAccessExpNode extends ExpNode {
         p.print(").");
         myId.unparse(p, 0);
     }
-
+    
+    public IdNode getId(){
+    	return myId;
+    }
     // 2 kids
     private ExpNode myLoc;    
     private IdNode myId;
