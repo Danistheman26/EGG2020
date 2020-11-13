@@ -1,62 +1,66 @@
 ###
 # This Makefile can be used to make a parser for the egg language
-# (parser.class) and to make a program (P4.class) that tests the parser, unparse and
-# name analysis methods in ast.java.
+# (parser.class) and to make a program (P5.class) that tests the parser and
+# the unparse methods in ast.java.
 #
 # make clean removes all generated files.
 #
 ###
 
 JC = javac
-FLAGS = -g  
+
 CP = ./deps:.
 
-P4.class: P4.java parser.class Yylex.class ASTnode.class
-	$(JC) $(FLAGS) -cp $(CP) P4.java
+P5.class: P5.java parser.class Yylex.class ASTnode.class
+	$(JC) -g -cp $(CP) P5.java
 
 parser.class: parser.java ASTnode.class Yylex.class ErrMsg.class
-	$(JC) $(FLAGS) -cp $(CP) parser.java
+	$(JC) -g -cp $(CP) parser.java
 
 parser.java: egg.cup
 	java -cp $(CP) java_cup.Main < egg.cup
 
 Yylex.class: egg.jlex.java sym.class ErrMsg.class
-	$(JC) $(FLAGS) -cp $(CP) egg.jlex.java
+	$(JC) -g -cp $(CP) egg.jlex.java
 
-ASTnode.class: ast.java SymTable.class
-	$(JC) $(FLAGS) -cp $(CP) ast.java
+ASTnode.class: ast.java Type.java Sym.class
+	$(JC) -g -cp $(CP) ast.java Type.java
 
 egg.jlex.java: egg.jlex sym.class
 	java -cp $(CP) JLex.Main egg.jlex
 
 sym.class: sym.java
-	$(JC) $(FLAGS) -cp $(CP) sym.java
+	$(JC) -g -cp $(CP) sym.java
 
 sym.java: egg.cup
-	java -cp $(CP) java_cup.Main < egg.cup
+	java java_cup.Main < egg.cup
 
 ErrMsg.class: ErrMsg.java
-	$(JC) $(FLAGS) -cp $(CP) ErrMsg.java
+	$(JC) -g -cp $(CP) ErrMsg.java
 
-Sym.class: Sym.java
-	$(JC) $(FLAGS) -cp $(CP) Sym.java
+Sym.class: Sym.java Type.class ast.java
+	$(JC) -g -cp $(CP) Sym.java ast.java
 
-SymTable.class: SymTable.java Sym.class DuplicateSymException.class WrongArgumentException.class EmptySymTableException.class
-	$(JC) $(FLAGS) -cp $(CP) SymTable.java
+SymTable.class: SymTable.java Sym.class DuplicateSymException.class EmptySymTableException.class WrongArgumentException.class
+	$(JC) -g -cp $(CP) SymTable.java
 
-DuplicateSymException.class: DuplicateSymException.java
-	$(JC) $(FLAGS) -cp $(CP) DuplicateSymException.java
+Type.class: Type.java
+	$(JC) -g -cp $(CP) Type.java ast.java
 
 WrongArgumentException.class: WrongArgumentException.java
-	$(JC) $(FLAGS) -cp $(CP) WrongArgumentException.java
+	$(JC) -g -cp $(CP) WrongArgumentException.java
+
+DuplicateSymException.class: DuplicateSymException.java
+	$(JC) -g -cp $(CP) DuplicateSymException.java
 
 EmptySymTableException.class: EmptySymTableException.java
-	$(JC) $(FLAGS) -cp $(CP) EmptySymTableException.java
+	$(JC) -g -cp $(CP) EmptySymTableException.java
 
-##test
+###
+# test
+#
 test:
-	java -cp $(CP) P4 nameErrors.egg nameErrors.out
-	java -cp $(CP) P4 test.egg test.out
+	java -cp $(CP) P5 test.egg test.out
 
 ###
 # clean
@@ -64,6 +68,5 @@ test:
 clean:
 	rm -f *~ *.class parser.java egg.jlex.java sym.java
 
-## cleantest (delete test artifacts)
 cleantest:
-	rm -f *.out
+	rm -f test.out
