@@ -142,7 +142,6 @@ class ProgramNode extends ASTnode {
      * all of the globals, struct defintions, and functions in the program.
      */
     public void nameAnalysis() {
-        SymTable symTab = new SymTable();
         myDeclList.nameAnalysis(symTab);
     }
 
@@ -150,7 +149,7 @@ class ProgramNode extends ASTnode {
      * typeCheck
      */
     public void typeCheck() {
-        myDeclList.typeCheck();
+        myDeclList.typeCheck(symTab);
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -159,6 +158,7 @@ class ProgramNode extends ASTnode {
 
     // 1 kid
     private DeclListNode myDeclList;
+    private SymTable symTab = new SymTable();
 }
 
 class DeclListNode extends ASTnode {
@@ -255,14 +255,6 @@ class FormalsListNode extends ASTnode {
      * typeCheck
      */
     public void typeCheck(SymTable symTab) {
-		Iterator<FormalDeclNode> it = myFormals.iterator();
-        if (it.hasNext()) { // if there is at least one element
-            it.next().typeCheck(symTab);
-            while (it.hasNext()) {  // print the rest of the list
-                p.print(", ");
-                it.next().unparse(p, indent);
-            }
-        }
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -334,9 +326,9 @@ class StmtListNode extends ASTnode {
      * typeCheck
      */
     public void typeCheck(SymTable symTab) {
-		Iterator<StmtNode> it = myStmts.iterator();
+	Iterator<StmtNode> it = myStmts.iterator();
         while (it.hasNext()) {
-            it.next().typeCheck(symTab);
+            ((StmtNode)it.next()).typeCheck(symTab);
         }
     }
 
@@ -399,6 +391,7 @@ abstract class DeclNode extends ASTnode {
      * Note: a formal decl needs to return a sym
      */
     abstract public Sym nameAnalysis(SymTable symTab);
+    abstract public void typeCheck(SymTable symTab);
 }
 
 class VarDeclNode extends DeclNode {
@@ -588,8 +581,8 @@ class FnDeclNode extends DeclNode {
      * typeCheck
      */
     public void typeCheck(SymTable symTab) {
-		FnBodyNode.typeCheck(symTab);
-	}
+	myBody.typeCheck(symTab);
+    }
 
     public void unparse(PrintWriter p, int indent) {
         addIndent(p, indent);
@@ -843,6 +836,7 @@ class StructNode extends TypeNode {
 
 abstract class StmtNode extends ASTnode {
     abstract public void nameAnalysis(SymTable symTab);
+    abstract public void typeCheck(SymTable symTab);
 }
 
 class AssignStmtNode extends StmtNode {
@@ -862,7 +856,7 @@ class AssignStmtNode extends StmtNode {
      * typeCheck =
      */
     public void typeCheck(SymTable symTab) {
-		//FIXME
+		myAssign.typeCheck(symTab);//FIXME
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -892,7 +886,7 @@ class PostIncStmtNode extends StmtNode {
      * typeCheck ++
      */
     public void typeCheck(SymTable symTab) {
-		//FIXME
+		myExp.typeCheck(symTab);//FIXME
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -922,7 +916,7 @@ class PostDecStmtNode extends StmtNode {
      * typeCheck --
      */
     public void typeCheck(SymTable symTab) {
-		//FIXME
+		myExp.typeCheck(symTab);//FIXME
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -952,7 +946,7 @@ class ReadStmtNode extends StmtNode {
      * typeCheck >>
      */
     public void typeCheck(SymTable symTab) {
-		//FIXME
+		myExp.typeCheck(symTab);//FIXME
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -983,7 +977,7 @@ class WriteStmtNode extends StmtNode {
      * typeCheck <<
      */
     public void typeCheck(SymTable symTab) {
-		//FIXME
+		myExp.typeCheck(symTab);//FIXME
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -1321,6 +1315,7 @@ abstract class ExpNode extends ASTnode {
      * Default version for nodes with no names
      */
     public void nameAnalysis(SymTable symTab) { }
+    public abstract Type typeCheck(SymTable symTab);
 }
 
 class IntLitNode extends ExpNode {
@@ -1617,7 +1612,7 @@ class DotAccessExpNode extends ExpNode {
      * typeCheck while
      */
     public Type typeCheck(SymTable symTab) {
-		return new StructType(); // FIXME, definitly wrong
+		return new StructType(new IdNode(0,0, "hi")); // FIXME, definitly wrong
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -1653,7 +1648,9 @@ class AssignNode extends ExpNode {
      * typeCheck
      */
     public Type typeCheck(SymTable symTab) {
-		return new BoolType();	// FIXME check if LHS and RHS are valid, and return their type
+		myLhs.typeCheck(symTab);	// FIXME check if LHS and RHS are valid, and return their type
+		myExp.typeCheck(symTab);
+		return new BoolType(); // FIXME change to appropriate type
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -1836,6 +1833,7 @@ class PlusNode extends BinaryExpNode {
      */
     public Type typeCheck(SymTable symTab) {
 		if (myExp1.typeCheck(symTab).isIntType() && myExp2.typeCheck(symTab).isIntType()) {
+		System.out.println("" + myExp1.typeCheck(symTab).isIntType() + myExp2.typeCheck(symTab).isIntType());
 			return new IntType();
 		}
 		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {

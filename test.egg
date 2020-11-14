@@ -1,0 +1,14 @@
+int y;
+int j;
+int shoes(){
+    bool blue;
+    blue = true;
+}
+int jake(){
+  bool start;
+  int e;
+  int i;
+  start = false;
+  e = (i + start);
+  start = true;
+}
