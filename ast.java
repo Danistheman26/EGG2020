@@ -150,7 +150,7 @@ class ProgramNode extends ASTnode {
      * typeCheck
      */
     public void typeCheck() {
-        // TODO: Implement a type checking method for this node and its children.
+        myDeclList.typeCheck();
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -187,6 +187,21 @@ class DeclListNode extends ASTnode {
             } else {
                 node.nameAnalysis(symTab);
             }
+        }
+    }
+	
+	/**
+     * typeCheck
+     */
+    public void typeCheck(SymTable symTab) {
+		Iterator it = myDecls.iterator();
+		try {
+            while (it.hasNext()) {
+                ((DeclNode)it.next()).typeCheck(symTab);
+            }
+        } catch (NoSuchElementException ex) {
+            System.err.println("unexpected NoSuchElementException in DeclListNode.print");
+            System.exit(-1);
         }
     }
 
@@ -235,6 +250,20 @@ class FormalsListNode extends ASTnode {
     public int length() {
         return myFormals.size();
     }
+	
+	    /**
+     * typeCheck
+     */
+    public void typeCheck(SymTable symTab) {
+		Iterator<FormalDeclNode> it = myFormals.iterator();
+        if (it.hasNext()) { // if there is at least one element
+            it.next().typeCheck(symTab);
+            while (it.hasNext()) {  // print the rest of the list
+                p.print(", ");
+                it.next().unparse(p, indent);
+            }
+        }
+    }
 
     public void unparse(PrintWriter p, int indent) {
         Iterator<FormalDeclNode> it = myFormals.iterator();
@@ -267,6 +296,14 @@ class FnBodyNode extends ASTnode {
         myDeclList.nameAnalysis(symTab);
         myStmtList.nameAnalysis(symTab);
     }
+	
+	/**
+     * typeCheck
+     */
+    public void typeCheck(SymTable symTab) {
+        myDeclList.typeCheck(symTab);	// FIXME might not need this
+		myStmtList.typeCheck(symTab);
+    }
 
     public void unparse(PrintWriter p, int indent) {
         myDeclList.unparse(p, indent);
@@ -290,6 +327,16 @@ class StmtListNode extends ASTnode {
     public void nameAnalysis(SymTable symTab) {
         for (StmtNode node : myStmts) {
             node.nameAnalysis(symTab);
+        }
+    }
+	
+	/**
+     * typeCheck
+     */
+    public void typeCheck(SymTable symTab) {
+		Iterator<StmtNode> it = myStmts.iterator();
+        while (it.hasNext()) {
+            it.next().typeCheck(symTab);
         }
     }
 
@@ -318,6 +365,15 @@ class ExpListNode extends ASTnode {
             node.nameAnalysis(symTab);
         }
     }
+	
+	/**
+     * typeCheck
+     */
+    public void typeCheck(SymTable symTab) {
+		for (ExpNode node : myExps) {
+            node.typeCheck(symTab);
+        }
+	}
 
     public void unparse(PrintWriter p, int indent) {
         Iterator<ExpNode> it = myExps.iterator();
@@ -432,6 +488,11 @@ class VarDeclNode extends DeclNode {
 
         return sym;
     }
+	
+	/**
+     * typeCheck
+     */
+    public void typeCheck(SymTable symTab) {}
 
     public void unparse(PrintWriter p, int indent) {
         addIndent(p, indent);
@@ -522,6 +583,13 @@ class FnDeclNode extends DeclNode {
 
         return null;
     }
+	
+	/**
+     * typeCheck
+     */
+    public void typeCheck(SymTable symTab) {
+		FnBodyNode.typeCheck(symTab);
+	}
 
     public void unparse(PrintWriter p, int indent) {
         addIndent(p, indent);
@@ -595,6 +663,11 @@ class FormalDeclNode extends DeclNode {
 
         return sym;
     }
+	
+	/**
+     * typeCheck
+     */
+    public void typeCheck(SymTable symTab) {}
 
     public void unparse(PrintWriter p, int indent) {
         myType.unparse(p, 0);
@@ -660,6 +733,11 @@ class StructDeclNode extends DeclNode {
 
         return null;
     }
+	
+	/**
+     * typeCheck
+     */
+    public void typeCheck(SymTable symTab) {}
 
     public void unparse(PrintWriter p, int indent) {
         addIndent(p, indent);
@@ -779,6 +857,13 @@ class AssignStmtNode extends StmtNode {
     public void nameAnalysis(SymTable symTab) {
         myAssign.nameAnalysis(symTab);
     }
+	
+	/**
+     * typeCheck =
+     */
+    public void typeCheck(SymTable symTab) {
+		//FIXME
+	}
 
     public void unparse(PrintWriter p, int indent) {
         addIndent(p, indent);
@@ -802,6 +887,13 @@ class PostIncStmtNode extends StmtNode {
     public void nameAnalysis(SymTable symTab) {
         myExp.nameAnalysis(symTab);
     }
+	
+	/**
+     * typeCheck ++
+     */
+    public void typeCheck(SymTable symTab) {
+		//FIXME
+	}
 
     public void unparse(PrintWriter p, int indent) {
         addIndent(p, indent);
@@ -825,6 +917,13 @@ class PostDecStmtNode extends StmtNode {
     public void nameAnalysis(SymTable symTab) {
         myExp.nameAnalysis(symTab);
     }
+	
+	/**
+     * typeCheck --
+     */
+    public void typeCheck(SymTable symTab) {
+		//FIXME
+	}
 
     public void unparse(PrintWriter p, int indent) {
         addIndent(p, indent);
@@ -848,6 +947,13 @@ class ReadStmtNode extends StmtNode {
     public void nameAnalysis(SymTable symTab) {
         myExp.nameAnalysis(symTab);
     }
+	
+	/**
+     * typeCheck >>
+     */
+    public void typeCheck(SymTable symTab) {
+		//FIXME
+	}
 
     public void unparse(PrintWriter p, int indent) {
         addIndent(p, indent);
@@ -872,6 +978,13 @@ class WriteStmtNode extends StmtNode {
     public void nameAnalysis(SymTable symTab) {
         myExp.nameAnalysis(symTab);
     }
+	
+	/**
+     * typeCheck <<
+     */
+    public void typeCheck(SymTable symTab) {
+		//FIXME
+	}
 
     public void unparse(PrintWriter p, int indent) {
         addIndent(p, indent);
@@ -912,6 +1025,15 @@ class IfStmtNode extends StmtNode {
             System.exit(-1);
         }
     }
+	
+	/**
+     * typeCheck if
+     */
+    public void typeCheck(SymTable symTab) {
+		myExp.typeCheck(symTab);	// FIXME must return type bool "Non-bool expression used as an if condition"
+		myDeclList.typeCheck(symTab);
+		myStmtList.typeCheck(symTab);
+	}
 
     public void unparse(PrintWriter p, int indent) {
         addIndent(p, indent);
@@ -975,6 +1097,17 @@ class IfElseStmtNode extends StmtNode {
             System.exit(-1);
         }
     }
+	
+	/**
+     * typeCheck if else
+     */
+    public void typeCheck(SymTable symTab) {
+		myExp.typeCheck(symTab);	// FIXME must return type bool "Non-bool expression used as an if condition"
+		myThenDeclList.typeCheck(symTab);
+		myThenStmtList.typeCheck(symTab);
+		myElseDeclList.typeCheck(symTab);
+		myElseStmtList.typeCheck(symTab);
+	}
 
     public void unparse(PrintWriter p, int indent) {
         addIndent(p, indent);
@@ -1029,6 +1162,15 @@ class WhileStmtNode extends StmtNode {
             System.exit(-1);
         }
     }
+	
+	/**
+     * typeCheck while
+     */
+    public void typeCheck(SymTable symTab) {
+		myExp.typeCheck(symTab);	// FIXME must return type bool "Non-bool expression used as a while condition"
+		myDeclList.typeCheck(symTab);
+		myStmtList.typeCheck(symTab);
+	}
 
     public void unparse(PrintWriter p, int indent) {
         addIndent(p, indent);
@@ -1075,6 +1217,15 @@ class RepeatStmtNode extends StmtNode {
             System.exit(-1);
         }
     }
+	
+	/**
+     * typeCheck while
+     */
+    public void typeCheck(SymTable symTab) {
+		myExp.typeCheck(symTab);	// FIXME must return type int "Non-integer expression used as a repeat clause"
+		myDeclList.typeCheck(symTab);
+		myStmtList.typeCheck(symTab);
+	}
 
     public void unparse(PrintWriter p, int indent) {
         addIndent(p, indent);
@@ -1104,8 +1255,15 @@ class CallStmtNode extends StmtNode {
      * Given a symbol table symTab, perform name analysis on this node's child
      */
     public void nameAnalysis(SymTable symTab) {
-        myCall.nameAnalysis(symTab);
+        myCall.nameAnalysis(symTab);		// FIXME might be finished might not?? idk
     }
+	
+	/**
+     * typeCheck while
+     */
+    public void typeCheck(SymTable symTab) {
+		myCall.typeCheck(symTab);
+	}
 
     public void unparse(PrintWriter p, int indent) {
         addIndent(p, indent);
@@ -1132,6 +1290,13 @@ class ReturnStmtNode extends StmtNode {
             myExp.nameAnalysis(symTab);
         }
     }
+	
+	/**
+     * typeCheck while
+     */
+    public void typeCheck(SymTable symTab) {
+		myExp.typeCheck(symTab);	// FIXME, need to check if correct return type for function
+	}
 
     public void unparse(PrintWriter p, int indent) {
         addIndent(p, indent);
@@ -1164,6 +1329,13 @@ class IntLitNode extends ExpNode {
         myCharNum = charNum;
         myIntVal = intVal;
     }
+	
+	/**
+     * typeCheck while
+     */
+    public Type typeCheck(SymTable symTab) {
+		return new IntType();
+	}
 
     public void unparse(PrintWriter p, int indent) {
         p.print(myIntVal);
@@ -1180,6 +1352,13 @@ class StringLitNode extends ExpNode {
         myCharNum = charNum;
         myStrVal = strVal;
     }
+	
+	/**
+     * typeCheck while
+     */
+    public Type typeCheck(SymTable symTab) {
+		return new StringType();
+	}
 
     public void unparse(PrintWriter p, int indent) {
         p.print(myStrVal);
@@ -1195,6 +1374,13 @@ class TrueNode extends ExpNode {
         myLineNum = lineNum;
         myCharNum = charNum;
     }
+	
+	/**
+     * typeCheck while
+     */
+    public Type typeCheck(SymTable symTab) {
+		return new BoolType();
+	}
 
     public void unparse(PrintWriter p, int indent) {
         p.print("true");
@@ -1209,6 +1395,13 @@ class FalseNode extends ExpNode {
         myLineNum = lineNum;
         myCharNum = charNum;
     }
+	
+	/**
+     * typeCheck while
+     */
+    public Type typeCheck(SymTable symTab) {
+		return new BoolType();
+	}
 
     public void unparse(PrintWriter p, int indent) {
         p.print("false");
@@ -1274,6 +1467,13 @@ class IdNode extends ExpNode {
             link(sym);
         }
     }
+	
+	/**
+     * typeCheck while
+     */
+    public Type typeCheck(SymTable symTab) {
+		return mySym.getType();
+	}
 
     public void unparse(PrintWriter p, int indent) {
         p.print(myStrVal);
@@ -1412,6 +1612,13 @@ class DotAccessExpNode extends ExpNode {
             }
         }
     }
+	
+	/**
+     * typeCheck while
+     */
+    public Type typeCheck(SymTable symTab) {
+		return new StructType(); // FIXME, definitly wrong
+	}
 
     public void unparse(PrintWriter p, int indent) {
         myLoc.unparse(p, 0);
@@ -1441,6 +1648,13 @@ class AssignNode extends ExpNode {
         myLhs.nameAnalysis(symTab);
         myExp.nameAnalysis(symTab);
     }
+	
+	/**
+     * typeCheck
+     */
+    public Type typeCheck(SymTable symTab) {
+		return new BoolType();	// FIXME check if LHS and RHS are valid, and return their type
+	}
 
     public void unparse(PrintWriter p, int indent) {
         if (indent != -1)  p.print("(");
@@ -1475,6 +1689,14 @@ class CallExpNode extends ExpNode {
         myId.nameAnalysis(symTab);
         myExpList.nameAnalysis(symTab);
     }
+	
+	/**
+     * typeCheck while
+     */
+    public Type typeCheck(SymTable symTab) {
+		// FIXME check if valid params return the function's return type
+		return new FnType();
+	}
 
     // ** unparse **
     public void unparse(PrintWriter p, int indent) {
@@ -1503,6 +1725,13 @@ abstract class UnaryExpNode extends ExpNode {
     public void nameAnalysis(SymTable symTab) {
         myExp.nameAnalysis(symTab);
     }
+	
+	/**
+     * typeCheck
+     */
+    public Type typeCheck(SymTable symTab) {
+		return new IntType();
+	}
 
     // one child
     protected ExpNode myExp;
@@ -1523,6 +1752,13 @@ abstract class BinaryExpNode extends ExpNode {
         myExp1.nameAnalysis(symTab);
         myExp2.nameAnalysis(symTab);
     }
+	
+	/**
+     * typeCheck
+     */
+    public Type typeCheck(SymTable symTab) {
+		return new IntType();
+	}
 
     // two kids
     protected ExpNode myExp1;
@@ -1537,6 +1773,20 @@ class UnaryMinusNode extends UnaryExpNode {
     public UnaryMinusNode(ExpNode exp) {
         super(exp);
     }
+	
+	/**
+     * typeCheck
+     */
+    public Type typeCheck(SymTable symTab) {
+		if (myExp.typeCheck(symTab).isIntType()) {
+			return new IntType();
+		}
+		if (myExp.typeCheck(symTab).isErrorType()) {
+			return new ErrorType();
+		}
+		System.err.println("Arithmetic operator applied to non-numeric operand");
+		return new ErrorType();
+	}
 
     public void unparse(PrintWriter p, int indent) {
         p.print("(-");
@@ -1549,6 +1799,21 @@ class NotNode extends UnaryExpNode {
     public NotNode(ExpNode exp) {
         super(exp);
     }
+	
+	/**
+     * typeCheck
+     */
+    public Type typeCheck(SymTable symTab) {
+		// FIXME check if operating on int
+		if (myExp.typeCheck(symTab).isBoolType()) {
+			return new BoolType();
+		}
+		if (myExp.typeCheck(symTab).isErrorType()) {
+			return new ErrorType();
+		}
+		System.err.println("Logical operator applied to non-bool operand");
+		return new ErrorType();
+	}
 
     public void unparse(PrintWriter p, int indent) {
         p.print("(!");
@@ -1565,6 +1830,20 @@ class PlusNode extends BinaryExpNode {
     public PlusNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
+	
+	/**
+     * typeCheck
+     */
+    public Type typeCheck(SymTable symTab) {
+		if (myExp1.typeCheck(symTab).isIntType() && myExp2.typeCheck(symTab).isIntType()) {
+			return new IntType();
+		}
+		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {
+			return new ErrorType();
+		}
+		System.err.println("Arithmetic operator applied to non-numeric operand");
+		return new ErrorType();
+	}
 
     public void unparse(PrintWriter p, int indent) {
         p.print("(");
@@ -1579,6 +1858,20 @@ class MinusNode extends BinaryExpNode {
     public MinusNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
+	
+	/**
+     * typeCheck
+     */
+    public Type typeCheck(SymTable symTab) {
+		if (myExp1.typeCheck(symTab).isIntType() && myExp2.typeCheck(symTab).isIntType()) {
+			return new IntType();
+		}
+		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {
+			return new ErrorType();
+		}
+		System.err.println("Arithmetic operator applied to non-numeric operand");
+		return new ErrorType();
+	}
 
     public void unparse(PrintWriter p, int indent) {
         p.print("(");
@@ -1593,6 +1886,20 @@ class TimesNode extends BinaryExpNode {
     public TimesNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
+	
+	/**
+     * typeCheck
+     */
+    public Type typeCheck(SymTable symTab) {
+		if (myExp1.typeCheck(symTab).isIntType() && myExp2.typeCheck(symTab).isIntType()) {
+			return new IntType();
+		}
+		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {
+			return new ErrorType();
+		}
+		System.err.println("Arithmetic operator applied to non-numeric operand");
+		return new ErrorType();
+	}
 
     public void unparse(PrintWriter p, int indent) {
         p.print("(");
@@ -1607,6 +1914,20 @@ class DivideNode extends BinaryExpNode {
     public DivideNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
+	
+	/**
+     * typeCheck
+     */
+    public Type typeCheck(SymTable symTab) {
+		if (myExp1.typeCheck(symTab).isIntType() && myExp2.typeCheck(symTab).isIntType()) {
+			return new IntType();
+		}
+		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {
+			return new ErrorType();
+		}
+		System.err.println("Arithmetic operator applied to non-numeric operand");
+		return new ErrorType();
+	}
 
     public void unparse(PrintWriter p, int indent) {
         p.print("(");
@@ -1621,6 +1942,21 @@ class AndNode extends BinaryExpNode {
     public AndNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
+	
+	/**
+     * typeCheck
+     */
+    public Type typeCheck(SymTable symTab) {
+		if (myExp1.typeCheck(symTab).isBoolType() && myExp2.typeCheck(symTab).isBoolType()) {
+			return new BoolType();
+		}
+		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {
+			return new ErrorType();
+		}
+		System.err.println("Logical operator applied to non-bool operand");
+		return new ErrorType();
+	}
+
 
     public void unparse(PrintWriter p, int indent) {
         p.print("(");
@@ -1636,6 +1972,20 @@ class OrNode extends BinaryExpNode {
         super(exp1, exp2);
     }
 
+	/**
+     * typeCheck
+     */
+    public Type typeCheck(SymTable symTab) {
+		if (myExp1.typeCheck(symTab).isBoolType() && myExp2.typeCheck(symTab).isBoolType()) {
+			return new BoolType();
+		}
+		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {
+			return new ErrorType();
+		}
+		System.err.println("Logical operator applied to non-bool operand");
+		return new ErrorType();
+	}
+	
     public void unparse(PrintWriter p, int indent) {
         p.print("(");
         myExp1.unparse(p, 0);
@@ -1649,6 +1999,36 @@ class EqualsNode extends BinaryExpNode {
     public EqualsNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
+	
+	/**
+     * typeCheck
+     */
+    public Type typeCheck(SymTable symTab) {
+		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {
+			return new ErrorType();
+		}
+		if (!myExp1.typeCheck(symTab).toString().equals(myExp2.typeCheck(symTab).toString())) {
+			System.err.println("Type mismatch");
+			return new ErrorType();
+		}
+		if (myExp1.typeCheck(symTab).isVoidType()) {
+			System.err.println("Equality operator applied to void functions");
+			return new ErrorType();
+		}
+		if (myExp1.typeCheck(symTab).isFnType()) {
+			System.err.println("Equality operator applied to functions");
+			return new ErrorType();
+		}
+		if (myExp1.typeCheck(symTab).isStructDefType()) {
+			System.err.println("Equality operator applied to struct names");
+			return new ErrorType();
+		}
+		if (myExp1.typeCheck(symTab).isStructType()) {
+			System.err.println("Equality operator applied to struct variables");
+			return new ErrorType();
+		}
+		return new BoolType();
+	}
 
     public void unparse(PrintWriter p, int indent) {
         p.print("(");
@@ -1663,6 +2043,36 @@ class NotEqualsNode extends BinaryExpNode {
     public NotEqualsNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
+	
+	/**
+     * typeCheck
+     */
+    public Type typeCheck(SymTable symTab) {
+		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {
+			return new ErrorType();
+		}
+		if (!myExp1.typeCheck(symTab).toString().equals(myExp2.typeCheck(symTab).toString())) {
+			System.err.println("Type mismatch");
+			return new ErrorType();
+		}
+		if (myExp1.typeCheck(symTab).isVoidType()) {
+			System.err.println("Equality operator applied to void functions");
+			return new ErrorType();
+		}
+		if (myExp1.typeCheck(symTab).isFnType()) {
+			System.err.println("Equality operator applied to functions");
+			return new ErrorType();
+		}
+		if (myExp1.typeCheck(symTab).isStructDefType()) {
+			System.err.println("Equality operator applied to struct names");
+			return new ErrorType();
+		}
+		if (myExp1.typeCheck(symTab).isStructType()) {
+			System.err.println("Equality operator applied to struct variables");
+			return new ErrorType();
+		}
+		return new BoolType();
+	}
 
     public void unparse(PrintWriter p, int indent) {
         p.print("(");
@@ -1677,6 +2087,20 @@ class LessNode extends BinaryExpNode {
     public LessNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
+	
+	/**
+     * typeCheck
+     */
+    public Type typeCheck(SymTable symTab) {
+		if (myExp1.typeCheck(symTab).isIntType() && myExp2.typeCheck(symTab).isIntType()) {
+			return new IntType();
+		}
+		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {
+			return new ErrorType();
+		}
+		System.err.println("Arithmetic operator applied to non-numeric operand");
+		return new ErrorType();
+	}
 
     public void unparse(PrintWriter p, int indent) {
         p.print("(");
@@ -1691,6 +2115,20 @@ class GreaterNode extends BinaryExpNode {
     public GreaterNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
+	
+	/**
+     * typeCheck
+     */
+    public Type typeCheck(SymTable symTab) {
+		if (myExp1.typeCheck(symTab).isIntType() && myExp2.typeCheck(symTab).isIntType()) {
+			return new IntType();
+		}
+		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {
+			return new ErrorType();
+		}
+		System.err.println("Arithmetic operator applied to non-numeric operand");
+		return new ErrorType();
+	}
 
     public void unparse(PrintWriter p, int indent) {
         p.print("(");
@@ -1705,6 +2143,20 @@ class LessEqNode extends BinaryExpNode {
     public LessEqNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
+	
+	/**
+     * typeCheck
+     */
+    public Type typeCheck(SymTable symTab) {
+		if (myExp1.typeCheck(symTab).isIntType() && myExp2.typeCheck(symTab).isIntType()) {
+			return new IntType();
+		}
+		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {
+			return new ErrorType();
+		}
+		System.err.println("Arithmetic operator applied to non-numeric operand");
+		return new ErrorType();
+	}
 
     public void unparse(PrintWriter p, int indent) {
         p.print("(");
@@ -1719,6 +2171,20 @@ class GreaterEqNode extends BinaryExpNode {
     public GreaterEqNode(ExpNode exp1, ExpNode exp2) {
         super(exp1, exp2);
     }
+	
+	/**
+     * typeCheck
+     */
+    public Type typeCheck(SymTable symTab) {
+		if (myExp1.typeCheck(symTab).isIntType() && myExp2.typeCheck(symTab).isIntType()) {
+			return new IntType();
+		}
+		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {
+			return new ErrorType();
+		}
+		System.err.println("Arithmetic operator applied to non-numeric operand");
+		return new ErrorType();
+	}
 
     public void unparse(PrintWriter p, int indent) {
         p.print("(");
