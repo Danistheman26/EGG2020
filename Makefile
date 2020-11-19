@@ -61,6 +61,7 @@ EmptySymTableException.class: EmptySymTableException.java
 #
 test:
 	java -cp $(CP) P5 test.egg test.out
+	java -cp $(CP) P5 typeErrors.egg
 
 ###
 # clean
