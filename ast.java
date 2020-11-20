@@ -112,6 +112,30 @@ import java.util.*;
 //
 // *#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#
 
+class typeClassRet {
+	Type T;
+	int LN;
+	int CN;
+
+	typeClassRet(Type T, int LN, int CN) {
+		this.T = T;
+		this.LN = LN;
+		this.CN = CN;
+	}
+
+	public Type getType() {
+		return this.T;
+	}
+
+	public int getLN() {
+		return this.LN;
+	}
+
+	public int getCN() {
+		return this.CN;
+	}
+}
+
 // *#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#
 // ASTnode class (base class for all other kinds of nodes)
 // *#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#
