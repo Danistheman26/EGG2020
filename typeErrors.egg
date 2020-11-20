@@ -1,20 +1,112 @@
-int jake(){
+
+struct bowler {
+  int bowlingBalls;
+};
+struct Player {
+  bool dead;
+};
+int tryToWriteReadMe() {
+  	return 4;
+}
+void writeVoid(){
+	return;
+}
+int wrongParams(int number, bool notNumber){
+  	return 4;
+}
+int hat(){
+  	return 4;
+}
+bool car(){
+  	return false;
+}
+int noReturn(){
+  	return;
+}
+  
+void shouldBeNoReturn(){
+	return false;
+}
+  
+int wrongType(){
+	return false;
+}
+void f(){}
+void g(){}
+
+int TestsForErrors(){
   int i;
   int e;
   bool b;
   int f;
-   bool start;
+  bool start;
+  
+  struct bowler bowlerHatMan;
+  struct Player Ibra;
   i = 0;
   e = 8;
   start = false;
   b = false;
+  
+  
+  cout << tryToWriteReadMe;
+  cout << bowler;
+  cout << bowlerHatMan;
+  cout << writeVoid();
+  cin >> tryToWriteReadMe;
+  cin >> bowler;
+  cin >> bowlerHatMan;
+  
+  e = b();
+  e = b(3);
+  
+  
+  e = wrongParams(3);
+  e = wrongParams(3, 4);
+  
+
+  
   e = (i + start);
+  e = (i - start);
+  e = (i * start);
+  e = (i / start);
+  start++;
+  start--;
+  
   b = (i > start);
+  b = (i < start);
+  b = (i >= start);
+  b = (i <= start);
+  
   b = (!i);
-  if(i){
-  }
-  while(i){
-  }
-  repeat(start){
-  }
+  b = (i && start);
+  b = (i || start);
+  if(i){}
+  while(i){}
+  repeat(start){}
+  repeat("not an int"){}
+  if(e == true){}
+  e = true;
+  
+  
+  if(f() == g()){}
+  
+  if(car == hat){}
+  if(car != hat){}
+  
+
+  if(bowler == Player){}
+  if(bowler != Player){}
+  
+  if(bowlerHatMan == Ibra){}
+  if(bowlerHatMan != Ibra){}
+  
+  hat = car;
+  bowler = Player;
+  bowlerHatMan = Ibra;
+  
+  bowlerHatMan.bowlingBalls = 3;
+  b = bowlerHatMan.bowlingBalls && false;
+  
 }
+
