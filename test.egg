@@ -9,6 +9,5 @@ int jake(){
   int e;
   int i;
   start = false;
-  e = (i + start);
   start = true;
 }

@@ -1024,7 +1024,10 @@ class IfStmtNode extends StmtNode {
      * typeCheck if
      */
     public void typeCheck(SymTable symTab) {
-		myExp.typeCheck(symTab);	// FIXME must return type bool "Non-bool expression used as an if condition"
+		if(!myExp.typeCheck(symTab).isBoolType()){
+			System.err.println("Non-bool expression used as an if condition");
+		}
+		
 		myDeclList.typeCheck(symTab);
 		myStmtList.typeCheck(symTab);
 	}
@@ -1096,7 +1099,9 @@ class IfElseStmtNode extends StmtNode {
      * typeCheck if else
      */
     public void typeCheck(SymTable symTab) {
-		myExp.typeCheck(symTab);	// FIXME must return type bool "Non-bool expression used as an if condition"
+		if(!myExp.typeCheck(symTab).isBoolType()){
+			System.err.println("Non-bool expression used as an if condition");
+		}
 		myThenDeclList.typeCheck(symTab);
 		myThenStmtList.typeCheck(symTab);
 		myElseDeclList.typeCheck(symTab);
@@ -1161,7 +1166,10 @@ class WhileStmtNode extends StmtNode {
      * typeCheck while
      */
     public void typeCheck(SymTable symTab) {
-		myExp.typeCheck(symTab);	// FIXME must return type bool "Non-bool expression used as a while condition"
+    		
+		if(!myExp.typeCheck(symTab).isBoolType()){
+			System.err.println("Non-bool expression used as a while condition");
+		}
 		myDeclList.typeCheck(symTab);
 		myStmtList.typeCheck(symTab);
 	}
@@ -1216,7 +1224,9 @@ class RepeatStmtNode extends StmtNode {
      * typeCheck while
      */
     public void typeCheck(SymTable symTab) {
-		myExp.typeCheck(symTab);	// FIXME must return type int "Non-integer expression used as a repeat clause"
+		if(!myExp.typeCheck(symTab).isIntType()){
+			System.err.println("Non-integer expression used as a repeat clause");
+		}
 		myDeclList.typeCheck(symTab);
 		myStmtList.typeCheck(symTab);
 	}
@@ -1781,7 +1791,8 @@ class UnaryMinusNode extends UnaryExpNode {
 		if (myExp.typeCheck(symTab).isErrorType()) {
 			return new ErrorType();
 		}
-		System.err.println("Arithmetic operator applied to non-numeric operand");
+		//ErrMsg.fatal(myExp.lineNum(), myExp.charNum(),
+                        //"Arithmetic operator applied to non-bool operand");
 		return new ErrorType();
 	}
 
@@ -2096,7 +2107,7 @@ class LessNode extends BinaryExpNode {
 		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {
 			return new ErrorType();
 		}
-		System.err.println("Arithmetic operator applied to non-numeric operand");
+		System.err.println("Relational operator applied to non-numeric operand");
 		return new ErrorType();
 	}
 
@@ -2124,7 +2135,7 @@ class GreaterNode extends BinaryExpNode {
 		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {
 			return new ErrorType();
 		}
-		System.err.println("Arithmetic operator applied to non-numeric operand");
+		System.err.println("Relational operator applied to non-numeric operand");
 		return new ErrorType();
 	}
 
@@ -2152,7 +2163,7 @@ class LessEqNode extends BinaryExpNode {
 		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {
 			return new ErrorType();
 		}
-		System.err.println("Arithmetic operator applied to non-numeric operand");
+		System.err.println("Relational operator applied to non-numeric operand");
 		return new ErrorType();
 	}
 
@@ -2180,7 +2191,7 @@ class GreaterEqNode extends BinaryExpNode {
 		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {
 			return new ErrorType();
 		}
-		System.err.println("Arithmetic operator applied to non-numeric operand");
+		System.err.println("Relational operator applied to non-numeric operand");
 		return new ErrorType();
 	}
 

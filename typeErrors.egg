@@ -1,0 +1,20 @@
+int jake(){
+  int i;
+  int e;
+  bool b;
+  int f;
+   bool start;
+  i = 0;
+  e = 8;
+  start = false;
+  b = false;
+  e = (i + start);
+  b = (i > start);
+  b = (!i);
+  if(i){
+  }
+  while(i){
+  }
+  repeat(start){
+  }
+}
