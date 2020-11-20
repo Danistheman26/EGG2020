@@ -1048,10 +1048,10 @@ class IfStmtNode extends StmtNode {
      * typeCheck if
      */
     public void typeCheck(SymTable symTab) {
-		if(!myExp.typeCheck(symTab).isBoolType()){
-			System.err.println("Non-bool expression used as an if condition");
+		typeClassRet exp = myExp.typeCheck(symTab);
+		if(!exp.getType().isBoolType()){
+			ErrMsg.fatal(exp.getLN(), exp.getCN(), "Non-bool expression used as an if condition");
 		}
-		
 		myDeclList.typeCheck(symTab);
 		myStmtList.typeCheck(symTab);
 	}
@@ -1120,11 +1120,12 @@ class IfElseStmtNode extends StmtNode {
     }
 	
 	/**
-     * typeCheck if else
+     * typeCheck if
      */
     public void typeCheck(SymTable symTab) {
-		if(!myExp.typeCheck(symTab).isBoolType()){
-			System.err.println("Non-bool expression used as an if condition");
+		typeClassRet exp = myExp.typeCheck(symTab);
+		if(!exp.getType().isBoolType()){
+			ErrMsg.fatal(exp.getLN(), exp.getCN(), "Non-bool expression used as an if condition");
 		}
 		myThenDeclList.typeCheck(symTab);
 		myThenStmtList.typeCheck(symTab);
@@ -1190,9 +1191,9 @@ class WhileStmtNode extends StmtNode {
      * typeCheck while
      */
     public void typeCheck(SymTable symTab) {
-    		
-		if(!myExp.typeCheck(symTab).isBoolType()){
-			System.err.println("Non-bool expression used as a while condition");
+		typeClassRet exp = myExp.typeCheck(symTab);
+		if(!exp.getType().isBoolType()){
+			ErrMsg.fatal(exp.getLN(), exp.getCN(), "Non-bool expression used as a while condition");
 		}
 		myDeclList.typeCheck(symTab);
 		myStmtList.typeCheck(symTab);
@@ -1248,8 +1249,9 @@ class RepeatStmtNode extends StmtNode {
      * typeCheck while
      */
     public void typeCheck(SymTable symTab) {
-		if(!myExp.typeCheck(symTab).isIntType()){
-			System.err.println("Non-integer expression used as a repeat clause");
+		typeClassRet exp = myExp.typeCheck(symTab);
+		if(!exp.getType().isIntType()){
+			ErrMsg.fatal(exp.getLN(), exp.getCN(), "Non-integer expression used as a repeat clause");
 		}
 		myDeclList.typeCheck(symTab);
 		myStmtList.typeCheck(symTab);
@@ -1360,10 +1362,10 @@ class IntLitNode extends ExpNode {
     }
 	
 	/**
-     * typeCheck while
+     * typeCheck
      */
-    public Type typeCheck(SymTable symTab) {
-		return new IntType();
+    public typeClassRet typeCheck(SymTable symTab) {
+		return new typeClassRet(new IntType(), myLineNum, myCharNum);
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -1383,10 +1385,10 @@ class StringLitNode extends ExpNode {
     }
 	
 	/**
-     * typeCheck while
+     * typeCheck
      */
-    public Type typeCheck(SymTable symTab) {
-		return new StringType();
+    public typeClassRet typeCheck(SymTable symTab) {
+		return new typeClassRet(new StringType(), myLineNum, myCharNum);
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -1405,10 +1407,10 @@ class TrueNode extends ExpNode {
     }
 	
 	/**
-     * typeCheck while
+     * typeCheck
      */
-    public Type typeCheck(SymTable symTab) {
-		return new BoolType();
+    public typeClassRet typeCheck(SymTable symTab) {
+		return new typeClassRet(new BoolType(), myLineNum, myCharNum);
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -1426,10 +1428,10 @@ class FalseNode extends ExpNode {
     }
 	
 	/**
-     * typeCheck while
+     * typeCheck
      */
-    public Type typeCheck(SymTable symTab) {
-		return new BoolType();
+    public typeClassRet typeCheck(SymTable symTab) {
+		return new typeClassRet(new BoolType(), myLineNum, myCharNum);
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -1498,10 +1500,10 @@ class IdNode extends ExpNode {
     }
 	
 	/**
-     * typeCheck while
+     * typeCheck
      */
-    public Type typeCheck(SymTable symTab) {
-		return mySym.getType();
+    public typeClassRet typeCheck(SymTable symTab) {
+		return new typeClassRet(mySym.getType(), myLineNum, myCharNum);
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -1643,10 +1645,10 @@ class DotAccessExpNode extends ExpNode {
     }
 	
 	/**
-     * typeCheck while
+     * typeCheck
      */
-    public Type typeCheck(SymTable symTab) {
-		return new StructType(new IdNode(0,0, "hi")); // FIXME, definitly wrong
+    public typeClassRet typeCheck(SymTable symTab) {
+		return new typeClassRet(new StructType(new IdNode(0,0, "hi")), myLineNum, myCharNum);
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -1681,10 +1683,10 @@ class AssignNode extends ExpNode {
 	/**
      * typeCheck
      */
-    public Type typeCheck(SymTable symTab) {
+    public typeClassRet typeCheck(SymTable symTab) {
 		myLhs.typeCheck(symTab);	// FIXME check if LHS and RHS are valid, and return their type
 		myExp.typeCheck(symTab);
-		return new BoolType(); // FIXME change to appropriate type
+		return new typeClassRet(new BoolType(), myLineNum, myCharNum); // FIXME change to appropriate type
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -1724,9 +1726,9 @@ class CallExpNode extends ExpNode {
 	/**
      * typeCheck while
      */
-    public Type typeCheck(SymTable symTab) {
+    public typeClassRet typeCheck(SymTable symTab) {
 		// FIXME check if valid params return the function's return type
-		return new FnType();
+		return new typeClassRet(new FnType(), myLineNum, myCharNum);
 	}
 
     // ** unparse **
@@ -1760,8 +1762,8 @@ abstract class UnaryExpNode extends ExpNode {
 	/**
      * typeCheck
      */
-    public Type typeCheck(SymTable symTab) {
-		return new IntType();
+    public typeClassRet typeCheck(SymTable symTab) {
+		return new typeClassRet(new BoolType(), myLineNum, myCharNum);
 	}
 
     // one child
@@ -1787,8 +1789,8 @@ abstract class BinaryExpNode extends ExpNode {
 	/**
      * typeCheck
      */
-    public Type typeCheck(SymTable symTab) {
-		return new IntType();
+    public typeClassRet typeCheck(SymTable symTab) {
+		return new typeClassRet(new BoolType(), myLineNum, myCharNum);
 	}
 
     // two kids
@@ -1808,16 +1810,19 @@ class UnaryMinusNode extends UnaryExpNode {
 	/**
      * typeCheck
      */
-    public Type typeCheck(SymTable symTab) {
-		if (myExp.typeCheck(symTab).isIntType()) {
-			return new IntType();
+    public typeClassRet typeCheck(SymTable symTab) {
+		typeClassRet exp = myExp.typeCheck(symTab);
+		
+		if (exp.getType().isIntType()) {
+			return new typeClassRet(new IntType(), exp.getLN(), exp.getCN());
 		}
-		if (myExp.typeCheck(symTab).isErrorType()) {
-			return new ErrorType();
+		if (exp.getType().isErrorType()) {
+			return new typeClassRet(new ErrorType(), 0, 0);
 		}
-		//ErrMsg.fatal(myExp.lineNum(), myExp.charNum(),
-                        //"Arithmetic operator applied to non-bool operand");
-		return new ErrorType();
+		
+		// throw an error
+		ErrMsg.fatal(exp.getLN(), exp.getCN(), "Arithmetic operator applied to non-numeric operand");
+		return new typeClassRet(new ErrorType(), 0, 0);
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -1835,16 +1840,19 @@ class NotNode extends UnaryExpNode {
 	/**
      * typeCheck
      */
-    public Type typeCheck(SymTable symTab) {
-		// FIXME check if operating on int
-		if (myExp.typeCheck(symTab).isBoolType()) {
-			return new BoolType();
+    public typeClassRet typeCheck(SymTable symTab) {
+		typeClassRet exp = myExp.typeCheck(symTab);
+		
+		if (exp.getType().isBoolType()) {
+			return new typeClassRet(new BoolType(), exp.getLN(), exp.getCN());
 		}
-		if (myExp.typeCheck(symTab).isErrorType()) {
-			return new ErrorType();
+		if (exp.getType().isErrorType()) {
+			return new typeClassRet(new ErrorType(), 0, 0);
 		}
-		System.err.println("Logical operator applied to non-bool operand");
-		return new ErrorType();
+		
+		// throw an error
+		ErrMsg.fatal(exp.getLN(), exp.getCN(), "Logical operator applied to non-bool operand");
+		return new typeClassRet(new ErrorType(), 0, 0);
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -1866,16 +1874,24 @@ class PlusNode extends BinaryExpNode {
 	/**
      * typeCheck
      */
-    public Type typeCheck(SymTable symTab) {
-		if (myExp1.typeCheck(symTab).isIntType() && myExp2.typeCheck(symTab).isIntType()) {
-		System.out.println("" + myExp1.typeCheck(symTab).isIntType() + myExp2.typeCheck(symTab).isIntType());
-			return new IntType();
+    public typeClassRet typeCheck(SymTable symTab) {
+		typeClassRet LHS = myExp1.typeCheck(symTab);
+		typeClassRet RHS = myExp2.typeCheck(symTab);
+		
+		if (RHS.getType().isIntType() && LHS.getType().isIntType()) {
+			return new typeClassRet(new IntType(), LHS.getLN(), LHS.getCN());
 		}
-		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {
-			return new ErrorType();
+		if (RHS.getType().isErrorType() || LHS.getType().isErrorType()) {
+			return new typeClassRet(new ErrorType(), 0, 0);
 		}
-		System.err.println("Arithmetic operator applied to non-numeric operand");
-		return new ErrorType();
+		
+		// throw an error
+		if (LHS.getType().isIntType()) {
+			ErrMsg.fatal(RHS.getLN(), RHS.getCN(), "Arithmetic operator applied to non-numeric operand");
+		else {
+			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Arithmetic operator applied to non-numeric operand");
+		}
+		return new typeClassRet(new ErrorType(), 0, 0);
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -1895,15 +1911,25 @@ class MinusNode extends BinaryExpNode {
 	/**
      * typeCheck
      */
-    public Type typeCheck(SymTable symTab) {
-		if (myExp1.typeCheck(symTab).isIntType() && myExp2.typeCheck(symTab).isIntType()) {
-			return new IntType();
+    public typeClassRet typeCheck(SymTable symTab) {
+		typeClassRet LHS = myExp1.typeCheck(symTab);
+		typeClassRet RHS = myExp2.typeCheck(symTab);
+		
+		if (RHS.getType().isIntType() && LHS.getType().isIntType()) {
+			return new typeClassRet(new IntType(), LHS.getLN(), LHS.getCN());
 		}
-		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {
-			return new ErrorType();
+		if (RHS.getType().isErrorType() || LHS.getType().isErrorType()) {
+			return new typeClassRet(new ErrorType(), 0, 0);
 		}
-		System.err.println("Arithmetic operator applied to non-numeric operand");
-		return new ErrorType();
+		
+		// throw an error
+		if (LHS.getType().isIntType()) {
+			ErrMsg.fatal(RHS.getLN(), RHS.getCN(), "Arithmetic operator applied to non-numeric operand");
+		else {
+			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Arithmetic operator applied to non-numeric operand");
+		}
+		return new typeClassRet(new ErrorType(), 0, 0);
+	}return new ErrorType();
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -1923,15 +1949,24 @@ class TimesNode extends BinaryExpNode {
 	/**
      * typeCheck
      */
-    public Type typeCheck(SymTable symTab) {
-		if (myExp1.typeCheck(symTab).isIntType() && myExp2.typeCheck(symTab).isIntType()) {
-			return new IntType();
+    public typeClassRet typeCheck(SymTable symTab) {
+		typeClassRet LHS = myExp1.typeCheck(symTab);
+		typeClassRet RHS = myExp2.typeCheck(symTab);
+		
+		if (RHS.getType().isIntType() && LHS.getType().isIntType()) {
+			return new typeClassRet(new IntType(), LHS.getLN(), LHS.getCN());
 		}
-		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {
-			return new ErrorType();
+		if (RHS.getType().isErrorType() || LHS.getType().isErrorType()) {
+			return new typeClassRet(new ErrorType(), 0, 0);
 		}
-		System.err.println("Arithmetic operator applied to non-numeric operand");
-		return new ErrorType();
+		
+		// throw an error
+		if (LHS.getType().isIntType()) {
+			ErrMsg.fatal(RHS.getLN(), RHS.getCN(), "Arithmetic operator applied to non-numeric operand");
+		else {
+			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Arithmetic operator applied to non-numeric operand");
+		}
+		return new typeClassRet(new ErrorType(), 0, 0);
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -1951,15 +1986,24 @@ class DivideNode extends BinaryExpNode {
 	/**
      * typeCheck
      */
-    public Type typeCheck(SymTable symTab) {
-		if (myExp1.typeCheck(symTab).isIntType() && myExp2.typeCheck(symTab).isIntType()) {
-			return new IntType();
+    public typeClassRet typeCheck(SymTable symTab) {
+		typeClassRet LHS = myExp1.typeCheck(symTab);
+		typeClassRet RHS = myExp2.typeCheck(symTab);
+		
+		if (RHS.getType().isIntType() && LHS.getType().isIntType()) {
+			return new typeClassRet(new IntType(), LHS.getLN(), LHS.getCN());
 		}
-		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {
-			return new ErrorType();
+		if (RHS.getType().isErrorType() || LHS.getType().isErrorType()) {
+			return new typeClassRet(new ErrorType(), 0, 0);
 		}
-		System.err.println("Arithmetic operator applied to non-numeric operand");
-		return new ErrorType();
+		
+		// throw an error
+		if (LHS.getType().isIntType()) {
+			ErrMsg.fatal(RHS.getLN(), RHS.getCN(), "Arithmetic operator applied to non-numeric operand");
+		else {
+			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Arithmetic operator applied to non-numeric operand");
+		}
+		return new typeClassRet(new ErrorType(), 0, 0);
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -1979,15 +2023,24 @@ class AndNode extends BinaryExpNode {
 	/**
      * typeCheck
      */
-    public Type typeCheck(SymTable symTab) {
-		if (myExp1.typeCheck(symTab).isBoolType() && myExp2.typeCheck(symTab).isBoolType()) {
-			return new BoolType();
+    public typeClassRet typeCheck(SymTable symTab) {
+		typeClassRet LHS = myExp1.typeCheck(symTab);
+		typeClassRet RHS = myExp2.typeCheck(symTab);
+		
+		if (LHS.getType().isBoolType() && RHS.getType().isBoolType()) {
+			return new typeClassRet(new BoolType(), LHS.getLN(), LHS.getCN());
 		}
-		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {
-			return new ErrorType();
+		if (LHS.getType().isErrorType() || RHS.getType().isErrorType()) {
+			return new typeClassRet(new ErrorType(), 0, 0);
 		}
-		System.err.println("Logical operator applied to non-bool operand");
-		return new ErrorType();
+		
+		// throw an error
+		if (LHS.getType().isBoolType()) {
+			ErrMsg.fatal(RHS.getLN(), RHS.getCN(), "Logical operator applied to non-bool operand");
+		else {
+			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Logical operator applied to non-bool operand");
+		}
+		return new typeClassRet(new ErrorType(), 0, 0);
 	}
 
 
@@ -2008,15 +2061,24 @@ class OrNode extends BinaryExpNode {
 	/**
      * typeCheck
      */
-    public Type typeCheck(SymTable symTab) {
-		if (myExp1.typeCheck(symTab).isBoolType() && myExp2.typeCheck(symTab).isBoolType()) {
-			return new BoolType();
+    public typeClassRet typeCheck(SymTable symTab) {
+		typeClassRet LHS = myExp1.typeCheck(symTab);
+		typeClassRet RHS = myExp2.typeCheck(symTab);
+		
+		if (LHS.getType().isBoolType() && RHS.getType().isBoolType()) {
+			return new typeClassRet(new BoolType(), LHS.getLN(), LHS.getCN());
 		}
-		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {
-			return new ErrorType();
+		if (LHS.getType().isErrorType() || RHS.getType().isErrorType()) {
+			return new typeClassRet(new ErrorType(), 0, 0);
 		}
-		System.err.println("Logical operator applied to non-bool operand");
-		return new ErrorType();
+		
+		// throw an error
+		if (LHS.getType().isBoolType()) {
+			ErrMsg.fatal(RHS.getLN(), RHS.getCN(), "Logical operator applied to non-bool operand");
+		else {
+			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Logical operator applied to non-bool operand");
+		}
+		return new typeClassRet(new ErrorType(), 0, 0);
 	}
 	
     public void unparse(PrintWriter p, int indent) {
@@ -2036,31 +2098,35 @@ class EqualsNode extends BinaryExpNode {
 	/**
      * typeCheck
      */
-    public Type typeCheck(SymTable symTab) {
-		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {
-			return new ErrorType();
+    public typeClassRet typeCheck(SymTable symTab) {
+		typeClassRet LHS = myExp1.typeCheck(symTab);
+		typeClassRet RHS = myExp2.typeCheck(symTab);
+		
+		if (RHS.getType().isErrorType() || LHS.getType().isErrorType()) {
+			return new typeClassRet(new ErrorType(), 0, 0);
 		}
-		if (!myExp1.typeCheck(symTab).toString().equals(myExp2.typeCheck(symTab).toString())) {
-			System.err.println("Type mismatch");
-			return new ErrorType();
+		
+		if (!RHS.getType().toString().equals(LHS.getType().toString())) {
+			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Type mismatch");
+			return new typeClassRet(new ErrorType(), 0, 0);
 		}
-		if (myExp1.typeCheck(symTab).isVoidType()) {
-			System.err.println("Equality operator applied to void functions");
-			return new ErrorType();
+		if (LHS.getType().isVoidType()) {
+			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Equality operator applied to void functions");
+			return new typeClassRet(new ErrorType(), 0, 0);
 		}
-		if (myExp1.typeCheck(symTab).isFnType()) {
-			System.err.println("Equality operator applied to functions");
-			return new ErrorType();
+		if (LHS.getType().isFnType()) {
+			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Equality operator applied to functions");
+			return new typeClassRet(new ErrorType(), 0, 0);
 		}
-		if (myExp1.typeCheck(symTab).isStructDefType()) {
-			System.err.println("Equality operator applied to struct names");
-			return new ErrorType();
+		if (LHS.getType().isStructDefType()) {
+			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Equality operator applied to struct names");
+			return new typeClassRet(new ErrorType(), 0, 0);
 		}
-		if (myExp1.typeCheck(symTab).isStructType()) {
-			System.err.println("Equality operator applied to struct variables");
-			return new ErrorType();
+		if (LHS.getType().isStructType()) {
+			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Equality operator applied to struct variables");
+			return new typeClassRet(new ErrorType(), 0, 0);
 		}
-		return new BoolType();
+		return new typeClassRet(new BoolType(), LHS.getLN(), LHS.getCN());
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -2080,31 +2146,35 @@ class NotEqualsNode extends BinaryExpNode {
 	/**
      * typeCheck
      */
-    public Type typeCheck(SymTable symTab) {
-		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {
-			return new ErrorType();
+    public typeClassRet typeCheck(SymTable symTab) {
+		typeClassRet LHS = myExp1.typeCheck(symTab);
+		typeClassRet RHS = myExp2.typeCheck(symTab);
+		
+		if (RHS.getType().isErrorType() || LHS.getType().isErrorType()) {
+			return new typeClassRet(new ErrorType(), 0, 0);
 		}
-		if (!myExp1.typeCheck(symTab).toString().equals(myExp2.typeCheck(symTab).toString())) {
-			System.err.println("Type mismatch");
-			return new ErrorType();
+		
+		if (!RHS.getType().toString().equals(LHS.getType().toString())) {
+			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Type mismatch");
+			return new typeClassRet(new ErrorType(), 0, 0);
 		}
-		if (myExp1.typeCheck(symTab).isVoidType()) {
-			System.err.println("Equality operator applied to void functions");
-			return new ErrorType();
+		if (LHS.getType().isVoidType()) {
+			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Equality operator applied to void functions");
+			return new typeClassRet(new ErrorType(), 0, 0);
 		}
-		if (myExp1.typeCheck(symTab).isFnType()) {
-			System.err.println("Equality operator applied to functions");
-			return new ErrorType();
+		if (LHS.getType().isFnType()) {
+			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Equality operator applied to functions");
+			return new typeClassRet(new ErrorType(), 0, 0);
 		}
-		if (myExp1.typeCheck(symTab).isStructDefType()) {
-			System.err.println("Equality operator applied to struct names");
-			return new ErrorType();
+		if (LHS.getType().isStructDefType()) {
+			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Equality operator applied to struct names");
+			return new typeClassRet(new ErrorType(), 0, 0);
 		}
-		if (myExp1.typeCheck(symTab).isStructType()) {
-			System.err.println("Equality operator applied to struct variables");
-			return new ErrorType();
+		if (LHS.getType().isStructType()) {
+			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Equality operator applied to struct variables");
+			return new typeClassRet(new ErrorType(), 0, 0);
 		}
-		return new BoolType();
+		return new typeClassRet(new BoolType(), LHS.getLN(), LHS.getCN());
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -2124,15 +2194,23 @@ class LessNode extends BinaryExpNode {
 	/**
      * typeCheck
      */
-    public Type typeCheck(SymTable symTab) {
-		if (myExp1.typeCheck(symTab).isIntType() && myExp2.typeCheck(symTab).isIntType()) {
-			return new IntType();
+    public typeClassRet typeCheck(SymTable symTab) {
+		typeClassRet LHS = myExp1.typeCheck(symTab);
+		typeClassRet RHS = myExp2.typeCheck(symTab);
+		if (RHS.getType().isIntType() && LHS.getType().isIntType()) {
+			return new typeClassRet(new IntType(), LHS.getLN(), LHS.getCN());
 		}
-		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {
-			return new ErrorType();
+		if (RHS.getType().isErrorType() || LHS.getType().isErrorType()) {
+			return new typeClassRet(new ErrorType(), 0, 0);
 		}
-		System.err.println("Relational operator applied to non-numeric operand");
-		return new ErrorType();
+		
+		// throw an error
+		if (LHS.getType().isIntType()) {
+			ErrMsg.fatal(RHS.getLN(), RHS.getCN(), "Relational operator applied to non-numeric operand");
+		else {
+			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Relational operator applied to non-numeric operand");
+		}
+		return new typeClassRet(new ErrorType(), 0, 0);
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -2152,15 +2230,23 @@ class GreaterNode extends BinaryExpNode {
 	/**
      * typeCheck
      */
-    public Type typeCheck(SymTable symTab) {
-		if (myExp1.typeCheck(symTab).isIntType() && myExp2.typeCheck(symTab).isIntType()) {
-			return new IntType();
+    public typeClassRet typeCheck(SymTable symTab) {
+		typeClassRet LHS = myExp1.typeCheck(symTab);
+		typeClassRet RHS = myExp2.typeCheck(symTab);
+		if (RHS.getType().isIntType() && LHS.getType().isIntType()) {
+			return new typeClassRet(new IntType(), LHS.getLN(), LHS.getCN());
 		}
-		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {
-			return new ErrorType();
+		if (RHS.getType().isErrorType() || LHS.getType().isErrorType()) {
+			return new typeClassRet(new ErrorType(), 0, 0);
 		}
-		System.err.println("Relational operator applied to non-numeric operand");
-		return new ErrorType();
+		
+		// throw an error
+		if (LHS.getType().isIntType()) {
+			ErrMsg.fatal(RHS.getLN(), RHS.getCN(), "Relational operator applied to non-numeric operand");
+		else {
+			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Relational operator applied to non-numeric operand");
+		}
+		return new typeClassRet(new ErrorType(), 0, 0);
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -2180,15 +2266,23 @@ class LessEqNode extends BinaryExpNode {
 	/**
      * typeCheck
      */
-    public Type typeCheck(SymTable symTab) {
-		if (myExp1.typeCheck(symTab).isIntType() && myExp2.typeCheck(symTab).isIntType()) {
-			return new IntType();
+    public typeClassRet typeCheck(SymTable symTab) {
+		typeClassRet LHS = myExp1.typeCheck(symTab);
+		typeClassRet RHS = myExp2.typeCheck(symTab);
+		if (RHS.getType().isIntType() && LHS.getType().isIntType()) {
+			return new typeClassRet(new IntType(), LHS.getLN(), LHS.getCN());
 		}
-		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {
-			return new ErrorType();
+		if (RHS.getType().isErrorType() || LHS.getType().isErrorType()) {
+			return new typeClassRet(new ErrorType(), 0, 0);
 		}
-		System.err.println("Relational operator applied to non-numeric operand");
-		return new ErrorType();
+		
+		// throw an error
+		if (LHS.getType().isIntType()) {
+			ErrMsg.fatal(RHS.getLN(), RHS.getCN(), "Relational operator applied to non-numeric operand");
+		else {
+			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Relational operator applied to non-numeric operand");
+		}
+		return new typeClassRet(new ErrorType(), 0, 0);
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -2208,15 +2302,23 @@ class GreaterEqNode extends BinaryExpNode {
 	/**
      * typeCheck
      */
-    public Type typeCheck(SymTable symTab) {
-		if (myExp1.typeCheck(symTab).isIntType() && myExp2.typeCheck(symTab).isIntType()) {
-			return new IntType();
+    public typeClassRet typeCheck(SymTable symTab) {
+		typeClassRet LHS = myExp1.typeCheck(symTab);
+		typeClassRet RHS = myExp2.typeCheck(symTab);
+		if (RHS.getType().isIntType() && LHS.getType().isIntType()) {
+			return new typeClassRet(new IntType(), LHS.getLN(), LHS.getCN());
 		}
-		if (myExp1.typeCheck(symTab).isErrorType() || myExp2.typeCheck(symTab).isErrorType()) {
-			return new ErrorType();
+		if (RHS.getType().isErrorType() || LHS.getType().isErrorType()) {
+			return new typeClassRet(new ErrorType(), 0, 0);
 		}
-		System.err.println("Relational operator applied to non-numeric operand");
-		return new ErrorType();
+		
+		// throw an error
+		if (LHS.getType().isIntType()) {
+			ErrMsg.fatal(RHS.getLN(), RHS.getCN(), "Relational operator applied to non-numeric operand");
+		else {
+			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Relational operator applied to non-numeric operand");
+		}
+		return new typeClassRet(new ErrorType(), 0, 0);
 	}
 
     public void unparse(PrintWriter p, int indent) {
