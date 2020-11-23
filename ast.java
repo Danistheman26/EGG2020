@@ -1413,7 +1413,7 @@ abstract class ExpNode extends ASTnode {
      * Default version for nodes with no names
      */
     public void nameAnalysis(SymTable symTab) { }
-    public abstract Type typeCheck(SymTable symTab);
+    public abstract typeClassRet typeCheck(SymTable symTab);
 }
 
 class IntLitNode extends ExpNode {
@@ -1710,7 +1710,7 @@ class DotAccessExpNode extends ExpNode {
      * typeCheck
      */
     public typeClassRet typeCheck(SymTable symTab) {
-		return new typeClassRet(new StructType(new IdNode(0,0, "hi")), myLineNum, myCharNum);
+		return new typeClassRet(new StructType(new IdNode(0,0, "hi")), 0, 0);
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -1863,7 +1863,7 @@ abstract class UnaryExpNode extends ExpNode {
      * typeCheck
      */
     public typeClassRet typeCheck(SymTable symTab) {
-		return new typeClassRet(new BoolType(), myLineNum, myCharNum);
+		return new typeClassRet(new BoolType(), 0, 0);//FIXME
 	}
 
     // one child
@@ -1890,7 +1890,7 @@ abstract class BinaryExpNode extends ExpNode {
      * typeCheck
      */
     public typeClassRet typeCheck(SymTable symTab) {
-		return new typeClassRet(new BoolType(), myLineNum, myCharNum);
+		return new typeClassRet(new BoolType(), 0, 0); //FIXME
 	}
 
     // two kids
@@ -1988,6 +1988,7 @@ class PlusNode extends BinaryExpNode {
 		// throw an error
 		if (LHS.getType().isIntType()) {
 			ErrMsg.fatal(RHS.getLN(), RHS.getCN(), "Arithmetic operator applied to non-numeric operand");
+		}
 		else {
 			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Arithmetic operator applied to non-numeric operand");
 		}
@@ -2025,6 +2026,7 @@ class MinusNode extends BinaryExpNode {
 		// throw an error
 		if (LHS.getType().isIntType()) {
 			ErrMsg.fatal(RHS.getLN(), RHS.getCN(), "Arithmetic operator applied to non-numeric operand");
+		}
 		else {
 			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Arithmetic operator applied to non-numeric operand");
 		}
@@ -2062,6 +2064,7 @@ class TimesNode extends BinaryExpNode {
 		// throw an error
 		if (LHS.getType().isIntType()) {
 			ErrMsg.fatal(RHS.getLN(), RHS.getCN(), "Arithmetic operator applied to non-numeric operand");
+		}
 		else {
 			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Arithmetic operator applied to non-numeric operand");
 		}
@@ -2099,6 +2102,7 @@ class DivideNode extends BinaryExpNode {
 		// throw an error
 		if (LHS.getType().isIntType()) {
 			ErrMsg.fatal(RHS.getLN(), RHS.getCN(), "Arithmetic operator applied to non-numeric operand");
+		}
 		else {
 			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Arithmetic operator applied to non-numeric operand");
 		}
@@ -2136,6 +2140,7 @@ class AndNode extends BinaryExpNode {
 		// throw an error
 		if (LHS.getType().isBoolType()) {
 			ErrMsg.fatal(RHS.getLN(), RHS.getCN(), "Logical operator applied to non-bool operand");
+		}
 		else {
 			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Logical operator applied to non-bool operand");
 		}
@@ -2174,6 +2179,7 @@ class OrNode extends BinaryExpNode {
 		// throw an error
 		if (LHS.getType().isBoolType()) {
 			ErrMsg.fatal(RHS.getLN(), RHS.getCN(), "Logical operator applied to non-bool operand");
+		}
 		else {
 			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Logical operator applied to non-bool operand");
 		}
@@ -2306,6 +2312,7 @@ class LessNode extends BinaryExpNode {
 		// throw an error
 		if (LHS.getType().isIntType()) {
 			ErrMsg.fatal(RHS.getLN(), RHS.getCN(), "Relational operator applied to non-numeric operand");
+		}
 		else {
 			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Relational operator applied to non-numeric operand");
 		}
@@ -2342,6 +2349,7 @@ class GreaterNode extends BinaryExpNode {
 		// throw an error
 		if (LHS.getType().isIntType()) {
 			ErrMsg.fatal(RHS.getLN(), RHS.getCN(), "Relational operator applied to non-numeric operand");
+		}
 		else {
 			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Relational operator applied to non-numeric operand");
 		}
@@ -2378,6 +2386,7 @@ class LessEqNode extends BinaryExpNode {
 		// throw an error
 		if (LHS.getType().isIntType()) {
 			ErrMsg.fatal(RHS.getLN(), RHS.getCN(), "Relational operator applied to non-numeric operand");
+		}
 		else {
 			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Relational operator applied to non-numeric operand");
 		}
@@ -2414,6 +2423,7 @@ class GreaterEqNode extends BinaryExpNode {
 		// throw an error
 		if (LHS.getType().isIntType()) {
 			ErrMsg.fatal(RHS.getLN(), RHS.getCN(), "Relational operator applied to non-numeric operand");
+		}
 		else {
 			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Relational operator applied to non-numeric operand");
 		}
