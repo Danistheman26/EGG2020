@@ -316,9 +316,9 @@ class FnBodyNode extends ASTnode {
 	/**
      * typeCheck
      */
-    public void typeCheck(SymTable symTab) {
+    public void typeCheck(SymTable symTab, Type idType) {
         myDeclList.typeCheck(symTab);	// FIXME might not need this
-		myStmtList.typeCheck(symTab);
+		myStmtList.typeCheck(symTab, idType);
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -349,10 +349,10 @@ class StmtListNode extends ASTnode {
 	/**
      * typeCheck
      */
-    public void typeCheck(SymTable symTab) {
+    public void typeCheck(SymTable symTab, Type idType) {
 	Iterator<StmtNode> it = myStmts.iterator();
         while (it.hasNext()) {
-            ((StmtNode)it.next()).typeCheck(symTab);
+            ((StmtNode)it.next()).typeCheck(symTab, idType);
         }
     }
 
@@ -609,7 +609,8 @@ class FnDeclNode extends DeclNode {
      * typeCheck
      */
     public void typeCheck(SymTable symTab) {
-	myBody.typeCheck(symTab);
+    	Type idType = (((FnSym)symTab.lookupGlobal(myId.name())).getReturnType());
+    	myBody.typeCheck(symTab, idType);
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -864,7 +865,7 @@ class StructNode extends TypeNode {
 
 abstract class StmtNode extends ASTnode {
     abstract public void nameAnalysis(SymTable symTab);
-    abstract public void typeCheck(SymTable symTab);
+    abstract public void typeCheck(SymTable symTab, Type idType);
 }
 
 class AssignStmtNode extends StmtNode {
@@ -883,7 +884,7 @@ class AssignStmtNode extends StmtNode {
 	/**
      * typeCheck =
      */
-    public void typeCheck(SymTable symTab) {
+    public void typeCheck(SymTable symTab, Type idType) {
 		myAssign.typeCheck(symTab);//FIXME
 	}
 
@@ -913,7 +914,7 @@ class PostIncStmtNode extends StmtNode {
 	/**
      * typeCheck ++
      */
-    public void typeCheck(SymTable symTab) {
+    public void typeCheck(SymTable symTab, Type idType) {
 		typeClassRet exp = myExp.typeCheck(symTab);
 		
 		if (exp.getType().isIntType()) {
@@ -952,7 +953,7 @@ class PostDecStmtNode extends StmtNode {
 	/**
      * typeCheck --
      */
-    public void typeCheck(SymTable symTab) {
+    public void typeCheck(SymTable symTab, Type idType) {
 		typeClassRet exp = myExp.typeCheck(symTab);
 		
 		if (exp.getType().isIntType()) {
@@ -990,7 +991,7 @@ class ReadStmtNode extends StmtNode {
 	/**
      * typeCheck >>
      */
-    public void typeCheck(SymTable symTab) {
+    public void typeCheck(SymTable symTab, Type idType) {
 		typeClassRet exp = myExp.typeCheck(symTab);
 		
 		// check if functions being passed
@@ -1041,7 +1042,7 @@ class WriteStmtNode extends StmtNode {
 	/**
      * typeCheck <<
      */
-    public void typeCheck(SymTable symTab) {
+    public void typeCheck(SymTable symTab, Type idType) {
 		typeClassRet exp = myExp.typeCheck(symTab);
 		
 		// check if functions being passed
@@ -1114,13 +1115,13 @@ class IfStmtNode extends StmtNode {
 	/**
      * typeCheck if
      */
-    public void typeCheck(SymTable symTab) {
+    public void typeCheck(SymTable symTab, Type idType) {
 		typeClassRet exp = myExp.typeCheck(symTab);
 		if(!exp.getType().isBoolType()){
 			ErrMsg.fatal(exp.getLN(), exp.getCN(), "Non-bool expression used as an if condition");
 		}
 		myDeclList.typeCheck(symTab);
-		myStmtList.typeCheck(symTab);
+		myStmtList.typeCheck(symTab, idType);
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -1189,15 +1190,15 @@ class IfElseStmtNode extends StmtNode {
 	/**
      * typeCheck if
      */
-    public void typeCheck(SymTable symTab) {
+    public void typeCheck(SymTable symTab, Type idType) {
 		typeClassRet exp = myExp.typeCheck(symTab);
 		if(!exp.getType().isBoolType()){
 			ErrMsg.fatal(exp.getLN(), exp.getCN(), "Non-bool expression used as an if condition");
 		}
 		myThenDeclList.typeCheck(symTab);
-		myThenStmtList.typeCheck(symTab);
+		myThenStmtList.typeCheck(symTab, idType);
 		myElseDeclList.typeCheck(symTab);
-		myElseStmtList.typeCheck(symTab);
+		myElseStmtList.typeCheck(symTab, idType);
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -1257,13 +1258,13 @@ class WhileStmtNode extends StmtNode {
 	/**
      * typeCheck while
      */
-    public void typeCheck(SymTable symTab) {
+    public void typeCheck(SymTable symTab, Type idType) {
 		typeClassRet exp = myExp.typeCheck(symTab);
 		if(!exp.getType().isBoolType()){
 			ErrMsg.fatal(exp.getLN(), exp.getCN(), "Non-bool expression used as a while condition");
 		}
 		myDeclList.typeCheck(symTab);
-		myStmtList.typeCheck(symTab);
+		myStmtList.typeCheck(symTab, idType);
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -1315,13 +1316,13 @@ class RepeatStmtNode extends StmtNode {
 	/**
      * typeCheck while
      */
-    public void typeCheck(SymTable symTab) {
+    public void typeCheck(SymTable symTab, Type idType) {
 		typeClassRet exp = myExp.typeCheck(symTab);
 		if(!exp.getType().isIntType()){
 			ErrMsg.fatal(exp.getLN(), exp.getCN(), "Non-integer expression used as a repeat clause");
 		}
 		myDeclList.typeCheck(symTab);
-		myStmtList.typeCheck(symTab);
+		myStmtList.typeCheck(symTab, idType);
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -1358,7 +1359,7 @@ class CallStmtNode extends StmtNode {
 	/**
      * typeCheck while
      */
-    public void typeCheck(SymTable symTab) {
+    public void typeCheck(SymTable symTab, Type idType) {
 		myCall.typeCheck(symTab);
 	}
 
@@ -1389,11 +1390,26 @@ class ReturnStmtNode extends StmtNode {
     }
 	
 	/**
-     * typeCheck while
+     * typeCheck while  return void;
      */
-    public void typeCheck(SymTable symTab) {
-		myExp.typeCheck(symTab);	// FIXME, need to check if correct return type for function
+    public void typeCheck(SymTable symTab, Type idType) {
+    	if(myExp != null){
+    		typeClassRet exp = myExp.typeCheck(symTab);
+		if(idType.isVoidType() && !exp.getType().isVoidType()){
+			ErrMsg.fatal(exp.getLN(), exp.getCN(), "Return with a value in a void function");
+		}
+		
+		else if(!idType.toString().equals(exp.getType().toString())){
+			ErrMsg.fatal(exp.getLN(), exp.getCN(), "Bad return value");
+		}
+		
 	}
+	else{
+		if(!idType.isVoidType()){
+			ErrMsg.fatal(0, 0, "Missing return value");
+		}
+	}
+    }
 
     public void unparse(PrintWriter p, int indent) {
         addIndent(p, indent);
@@ -1827,15 +1843,13 @@ class CallExpNode extends ExpNode {
 		}
 		
 		// check if valid myExpList length 
-		System.out.print("fnsym:" + ((FnSym)symTab.lookupGlobal(myId.name())).getNumParams());
-		System.out.println("myexp:" + myExpList.getListLength());
-		if (!((FnSym)symTab.lookupGlobal(myId.name())).getNumParams() == myExpList.getListLength()) {
+		if (((FnSym)symTab.lookupGlobal(myId.name())).getNumParams() != myExpList.getListLength()) {
 			ErrMsg.fatal(id.getLN(), id.getCN(), "Function call with wrong number of args");
 		}
 		
 		// check if myExpList has valid types "Type of actual does not match type of formal"
 		
-		return new typeClassRet(new FnType(), id.getLN(), id.getCN()); // FIXME return whatever the return type is
+		return new typeClassRet(((FnSym)symTab.lookupGlobal(myId.name())).getReturnType(), id.getLN(), id.getCN()); 
 	}
 
     // ** unparse **
