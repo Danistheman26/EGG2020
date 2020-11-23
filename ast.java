@@ -401,6 +401,10 @@ class ExpListNode extends ASTnode {
             }
         }
     }
+	
+	public int getListLength() {
+		myExps.length();
+	}
 
     // list of kids (ExpNodes)
     private List<ExpNode> myExps;
@@ -910,7 +914,16 @@ class PostIncStmtNode extends StmtNode {
      * typeCheck ++
      */
     public void typeCheck(SymTable symTab) {
-		myExp.typeCheck(symTab);//FIXME
+		typeClassRet exp = myExp.typeCheck(symTab);
+		
+		if (exp.getType().isIntType()) {
+			return;
+		}
+		if (exp.getType().isErrorType()) {
+			return;
+		}
+		ErrMsg.fatal(exp.getLN(), exp.getCN(), "Arithmetic operator applied to non-numeric operand");
+		return;
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -940,14 +953,17 @@ class PostDecStmtNode extends StmtNode {
      * typeCheck --
      */
     public void typeCheck(SymTable symTab) {
-		myExp.typeCheck(symTab);//FIXME
+		typeClassRet exp = myExp.typeCheck(symTab);
+		
+		if (exp.getType().isIntType()) {
+			return;
+		}
+		if (exp.getType().isErrorType()) {
+			return;
+		}
+		ErrMsg.fatal(exp.getLN(), exp.getCN(), "Arithmetic operator applied to non-numeric operand");
+		return;
 	}
-
-    public void unparse(PrintWriter p, int indent) {
-        addIndent(p, indent);
-        myExp.unparse(p, 0);
-        p.println("--;");
-    }
 
     // 1 kid
     private ExpNode myExp;
@@ -970,9 +986,29 @@ class ReadStmtNode extends StmtNode {
      * typeCheck >>
      */
     public void typeCheck(SymTable symTab) {
-		myExp.typeCheck(symTab);//FIXME
+		typeClassRet exp = myExp.typeCheck(symTab);
+		
+		// check if functions being passed
+		if (exp.getType().isFnType()) {
+			ErrMsg.fatal(exp.getLN(), exp.getCN(), "Attempt to read a function");
+			return;
+		}
+		
+		// check if struct name
+		if (exp.getType().isStructDefType()) {
+			ErrMsg.fatal(exp.getLN(), exp.getCN(), "Attempt to read a struct name");
+			return;
+		}
+		
+		// check if struct var
+		if (exp.getType().isStructType()) {
+			ErrMsg.fatal(exp.getLN(), exp.getCN(), "Attempt to read a struct variable");
+			return;
+		}
+		return;
 	}
 
+	
     public void unparse(PrintWriter p, int indent) {
         addIndent(p, indent);
         p.print("cin >> ");
@@ -1001,7 +1037,33 @@ class WriteStmtNode extends StmtNode {
      * typeCheck <<
      */
     public void typeCheck(SymTable symTab) {
-		myExp.typeCheck(symTab);//FIXME
+		typeClassRet exp = myExp.typeCheck(symTab);
+		
+		// check if functions being passed
+		if (exp.getType().isFnType()) {
+			ErrMsg.fatal(exp.getLN(), exp.getCN(), "Attempt to write a function");
+			return;
+		}
+		
+		// check if struct name
+		if (exp.getType().isStructDefType()) {
+			ErrMsg.fatal(exp.getLN(), exp.getCN(), "Attempt to write a struct name");
+			return;
+		}
+		
+		// check if struct var
+		if (exp.getType().isStructType()) {
+			ErrMsg.fatal(exp.getLN(), exp.getCN(), "Attempt to write a struct variable");
+			return;
+		}
+		
+		// check if void
+		if (exp.getType().isVoidType()) {
+			ErrMsg.fatal(exp.getLN(), exp.getCN(), "Attempt to write void");
+			return;
+		}
+		
+		return;
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -1684,9 +1746,33 @@ class AssignNode extends ExpNode {
      * typeCheck
      */
     public typeClassRet typeCheck(SymTable symTab) {
-		myLhs.typeCheck(symTab);	// FIXME check if LHS and RHS are valid, and return their type
-		myExp.typeCheck(symTab);
-		return new typeClassRet(new BoolType(), myLineNum, myCharNum); // FIXME change to appropriate type
+		typeClassRet LHS = myLhs.typeCheck(symTab);
+		typeClassRet RHS = myExp.typeCheck(symTab);
+		
+		// check if type missmatch
+		if (!RHS.getType().toString().equals(LHS.getType().toString())) {
+			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Type mismatch");
+			return new typeClassRet(new ErrorType(), 0, 0);
+		}
+		
+		// check if functions being passed
+		if (LHS.getType().isStructDefType() && RHS.getType().isStructDefType()) {
+			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Function assignment");
+			return new typeClassRet(new ErrorType(), 0, 0);
+		}
+		
+		// check if struct name
+		if (LHS.getType().isStructDefType() && RHS.getType().isStructDefType()) {
+			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Struct name assignment");
+			return new typeClassRet(new ErrorType(), 0, 0);
+		}
+		
+		// check if struct var
+		if (LHS.getType().isStructType() && RHS.getType().isStructType()) {
+			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Struct variable  assignment");
+			return new typeClassRet(new ErrorType(), 0, 0);
+		}
+		return new typeClassRet(LHS.getType(), myLineNum, myCharNum); // FIXME change to appropriate type
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -1727,8 +1813,22 @@ class CallExpNode extends ExpNode {
      * typeCheck while
      */
     public typeClassRet typeCheck(SymTable symTab) {
-		// FIXME check if valid params return the function's return type
-		return new typeClassRet(new FnType(), myLineNum, myCharNum);
+		typeClassRet id = myId.typeCheck(symTab);
+		typeClassRet exp = myExpList.typeCheck(symTab);
+		
+		// check if id is a non function type 
+		if (!id.getType().isFnType()) {
+			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Attempt to call a non-function");
+		}
+		
+		// check if valid myExpList length 
+		if (symTab.lookupGlobal(myId).getNumParams() == myExpList.getListLength()) {
+			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Function call with wrong number of args");
+		}
+		
+		// check if myExpList has valid types "Type of actual does not match type of formal"
+		
+		return new typeClassRet(new FnType(), myLineNum, myCharNum); // FIXME return whatever the return type is
 	}
 
     // ** unparse **
@@ -1929,7 +2029,6 @@ class MinusNode extends BinaryExpNode {
 			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Arithmetic operator applied to non-numeric operand");
 		}
 		return new typeClassRet(new ErrorType(), 0, 0);
-	}return new ErrorType();
 	}
 
     public void unparse(PrintWriter p, int indent) {
