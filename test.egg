@@ -30,6 +30,7 @@ void getShoes(int num){
 	color = false;
 	numberShoes = numShoes(num);
 	colorShoes = shoes(color);
+	color = (colorShoes = false);
 	return;
 }
 

@@ -403,7 +403,7 @@ class ExpListNode extends ASTnode {
     }
 	
 	public int getListLength() {
-		myExps.length();
+		return myExps.size();
 	}
 
     // list of kids (ExpNodes)
@@ -964,6 +964,11 @@ class PostDecStmtNode extends StmtNode {
 		ErrMsg.fatal(exp.getLN(), exp.getCN(), "Arithmetic operator applied to non-numeric operand");
 		return;
 	}
+	public void unparse(PrintWriter p, int indent) {
+        addIndent(p, indent);
+        myExp.unparse(p, 0);
+        p.println("--;");
+        }
 
     // 1 kid
     private ExpNode myExp;
@@ -1772,7 +1777,7 @@ class AssignNode extends ExpNode {
 			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Struct variable  assignment");
 			return new typeClassRet(new ErrorType(), 0, 0);
 		}
-		return new typeClassRet(LHS.getType(), myLineNum, myCharNum); // FIXME change to appropriate type
+		return new typeClassRet(LHS.getType(), LHS.getLN(), LHS.getCN()); // FIXME change to appropriate type
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -1814,21 +1819,23 @@ class CallExpNode extends ExpNode {
      */
     public typeClassRet typeCheck(SymTable symTab) {
 		typeClassRet id = myId.typeCheck(symTab);
-		typeClassRet exp = myExpList.typeCheck(symTab);
+		myExpList.typeCheck(symTab);
 		
 		// check if id is a non function type 
 		if (!id.getType().isFnType()) {
-			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Attempt to call a non-function");
+			ErrMsg.fatal(id.getLN(), id.getCN(), "Attempt to call a non-function");
 		}
 		
 		// check if valid myExpList length 
-		if (symTab.lookupGlobal(myId).getNumParams() == myExpList.getListLength()) {
-			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Function call with wrong number of args");
+		System.out.print("fnsym:" + ((FnSym)symTab.lookupGlobal(myId.name())).getNumParams());
+		System.out.println("myexp:" + myExpList.getListLength());
+		if (!((FnSym)symTab.lookupGlobal(myId.name())).getNumParams() == myExpList.getListLength()) {
+			ErrMsg.fatal(id.getLN(), id.getCN(), "Function call with wrong number of args");
 		}
 		
 		// check if myExpList has valid types "Type of actual does not match type of formal"
 		
-		return new typeClassRet(new FnType(), myLineNum, myCharNum); // FIXME return whatever the return type is
+		return new typeClassRet(new FnType(), id.getLN(), id.getCN()); // FIXME return whatever the return type is
 	}
 
     // ** unparse **
