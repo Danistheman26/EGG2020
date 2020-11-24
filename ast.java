@@ -1636,7 +1636,7 @@ class DotAccessExpNode extends ExpNode {
     public int charNum() {
         return myId.charNum();
     }
-
+	
     /**
      * nameAnalysis
      * Given a symbol table symTab, do:
@@ -1736,7 +1736,11 @@ class DotAccessExpNode extends ExpNode {
      * typeCheck
      */
     public typeClassRet typeCheck(SymTable symTab) {
-		return new typeClassRet(new StructType(new IdNode(0,0, "hi")), 0, 0);
+		
+		SymTable inStruct = ((StructSym)myStmtTable.lookupGlobal(((IdNode)myLoc).myStrVal())).getParams();
+		Type exp = inStruct.lookupLocal(myId.myStrVal()).getType();
+		
+		return new typeClassRet(exp, myId.lineNum(), myId.charNum());
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -1795,7 +1799,7 @@ class AssignNode extends ExpNode {
 		
 		// check if struct var
 		if (LHS.getType().isStructType() && RHS.getType().isStructType()) {
-			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Struct variable  assignment");
+			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Struct variable assignment");
 			return new typeClassRet(new ErrorType(), 0, 0);
 		}
 		return new typeClassRet(LHS.getType(), LHS.getLN(), LHS.getCN());
