@@ -279,6 +279,7 @@ class FormalsListNode extends ASTnode {
      * typeCheck
      */
     public void typeCheck(SymTable symTab) {
+		// FIXME
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -404,6 +405,10 @@ class ExpListNode extends ASTnode {
 	
 	public int getListLength() {
 		return myExps.size();
+	}
+	
+	public List<ExpNode> getListExps() {
+		return myExps;
 	}
 
     // list of kids (ExpNodes)
@@ -885,7 +890,7 @@ class AssignStmtNode extends StmtNode {
      * typeCheck =
      */
     public void typeCheck(SymTable symTab, Type idType) {
-		myAssign.typeCheck(symTab);//FIXME
+		myAssign.typeCheck(symTab);
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -1353,7 +1358,7 @@ class CallStmtNode extends StmtNode {
      * Given a symbol table symTab, perform name analysis on this node's child
      */
     public void nameAnalysis(SymTable symTab) {
-        myCall.nameAnalysis(symTab);		// FIXME might be finished might not?? idk
+        myCall.nameAnalysis(symTab);
     }
 	
 	/**
@@ -1793,7 +1798,7 @@ class AssignNode extends ExpNode {
 			ErrMsg.fatal(LHS.getLN(), LHS.getCN(), "Struct variable  assignment");
 			return new typeClassRet(new ErrorType(), 0, 0);
 		}
-		return new typeClassRet(LHS.getType(), LHS.getLN(), LHS.getCN()); // FIXME change to appropriate type
+		return new typeClassRet(LHS.getType(), LHS.getLN(), LHS.getCN());
 	}
 
     public void unparse(PrintWriter p, int indent) {
@@ -1835,7 +1840,6 @@ class CallExpNode extends ExpNode {
      */
     public typeClassRet typeCheck(SymTable symTab) {
 		typeClassRet id = myId.typeCheck(symTab);
-		myExpList.typeCheck(symTab);
 		
 		// check if id is a non function type 
 		if (!id.getType().isFnType()) {
@@ -1848,6 +1852,13 @@ class CallExpNode extends ExpNode {
 		}
 		
 		// check if myExpList has valid types "Type of actual does not match type of formal"
+		// compare myExpList.getType() to ((FnSym)symTab.lookupGlobal(myId.name())).getParamTypes();
+		for (int i = 0; i < myExpList.size(); i++ ) {
+			typeClassRet exp = myExpList.getListExps()[i].typeCheck(symTab);
+			if (!exp.getType().equals(((FnSym)symTab.lookupGlobal(myId.name())).getParamTypes()[i])) {
+				ErrMsg.fatal(exp.getLN(), exp.getCN(), "Type of actual does not match type of formal");
+			}
+		}
 		
 		return new typeClassRet(((FnSym)symTab.lookupGlobal(myId.name())).getReturnType(), id.getLN(), id.getCN()); 
 	}
@@ -1884,7 +1895,7 @@ abstract class UnaryExpNode extends ExpNode {
      * typeCheck
      */
     public typeClassRet typeCheck(SymTable symTab) {
-		return new typeClassRet(new BoolType(), 0, 0);//FIXME
+		return new typeClassRet(new BoolType(), 0, 0);
 	}
 
     // one child
@@ -1911,7 +1922,7 @@ abstract class BinaryExpNode extends ExpNode {
      * typeCheck
      */
     public typeClassRet typeCheck(SymTable symTab) {
-		return new typeClassRet(new BoolType(), 0, 0); //FIXME
+		return new typeClassRet(new BoolType(), 0, 0);
 	}
 
     // two kids
