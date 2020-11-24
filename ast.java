@@ -1848,21 +1848,28 @@ class CallExpNode extends ExpNode {
 		// check if id is a non function type 
 		if (!id.getType().isFnType()) {
 			ErrMsg.fatal(id.getLN(), id.getCN(), "Attempt to call a non-function");
+			return new typeClassRet(new ErrorType(), 0, 0);
 		}
-		
-		// check if valid myExpList length 
-		if (((FnSym)symTab.lookupGlobal(myId.name())).getNumParams() != myExpList.getListLength()) {
-			ErrMsg.fatal(id.getLN(), id.getCN(), "Function call with wrong number of args");
-		}
-		
-		// check if myExpList has valid types "Type of actual does not match type of formal"
-		// compare myExpList.getType() to ((FnSym)symTab.lookupGlobal(myId.name())).getParamTypes();
-		for (int i = 0; i < myExpList.size(); i++ ) {
-			typeClassRet exp = myExpList.getListExps()[i].typeCheck(symTab);
-			if (!exp.getType().equals(((FnSym)symTab.lookupGlobal(myId.name())).getParamTypes()[i])) {
-				ErrMsg.fatal(exp.getLN(), exp.getCN(), "Type of actual does not match type of formal");
+		if(((FnSym)symTab.lookupGlobal(myId.name())) != null){
+			// check if valid myExpList length 
+			if (((FnSym)symTab.lookupGlobal(myId.name())).getNumParams() != myExpList.getListLength()) {
+				ErrMsg.fatal(id.getLN(), id.getCN(), "Function call with wrong number of args");
+				return new typeClassRet(new ErrorType(), 0, 0);
 			}
-		}
+		
+			// check if myExpList has valid types "Type of actual does not match type of formal"
+			// compare myExpList.getType() to ((FnSym)symTab.lookupGlobal(myId.name())).getParamTypes();
+			Iterator it = myExpList.getListExps().iterator();
+			Iterator it2 = ((FnSym)symTab.lookupGlobal(myId.name())).getParamTypes().iterator();
+			while (it.hasNext()) {
+		        	typeClassRet exp = ((ExpNode)it.next()).typeCheck(symTab);
+		        	Type paramType = (Type)it2.next();
+		        	System.out.println("currexp:" + exp.getType() + "fn arg:" + paramType);
+		        	if (!exp.getType().equals(paramType)) {
+					ErrMsg.fatal(exp.getLN(), exp.getCN(), "Type of actual does not match type of formal");
+				}
+		    	}
+            	}
 		
 		return new typeClassRet(((FnSym)symTab.lookupGlobal(myId.name())).getReturnType(), id.getLN(), id.getCN()); 
 	}

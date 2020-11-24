@@ -70,7 +70,7 @@ int jake() {
     if ((start(bool) == true)) {
     }
     b(bool) = true;
-    b(bool) = shoes(bool->bool)(e(int));
+    b(bool) = shoes(bool->bool)(start(bool));
     bowlerHatMan(bowler).bowlingBalls(int) = 3;
     Ibra(Player).dead(bool) = false;
     e(int) = (i(int) + bowlerHatMan(bowler).bowlingBalls(int));
