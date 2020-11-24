@@ -1,0 +1,114 @@
+struct bowler{
+    int bowlingBalls;
+};
+
+struct Player{
+    bool dead;
+};
+
+int tryToWriteReadMe() {
+    return 4;
+}
+
+void writeVoid() {
+    return;
+}
+
+int wrongParams(int number, bool notNumber) {
+    return 4;
+}
+
+int hat() {
+    return 4;
+}
+
+bool car() {
+    return false;
+}
+
+int noReturn() {
+    return;
+}
+
+void shouldBeNoReturn() {
+    return false;
+}
+
+int wrongType() {
+    return false;
+}
+
+void f() {
+}
+
+void g() {
+}
+
+int TestsForErrors() {
+    int i;
+    int e;
+    bool b;
+    int f;
+    bool start;
+    struct bowler bowlerHatMan;
+    struct Player Ibra;
+    i(int) = 0;
+    e(int) = 8;
+    start(bool) = false;
+    b(bool) = false;
+    cout << tryToWriteReadMe(->int);
+    cout << bowler(struct);
+    cout << bowlerHatMan(bowler);
+    cout << writeVoid(->void)();
+    cin >> tryToWriteReadMe(->int);
+    cin >> bowler(struct);
+    cin >> bowlerHatMan(bowler);
+    e(int) = b(bool)();
+    e(int) = b(bool)(3);
+    e(int) = wrongParams(int,bool->int)(3);
+    e(int) = wrongParams(int,bool->int)(3, 4);
+    e(int) = (i(int) + start(bool));
+    e(int) = (i(int) - start(bool));
+    e(int) = (i(int) * start(bool));
+    e(int) = (i(int) / start(bool));
+    start(bool)++;
+    start(bool)--;
+    b(bool) = (i(int) > start(bool));
+    b(bool) = (i(int) < start(bool));
+    b(bool) = (i(int) >= start(bool));
+    b(bool) = (i(int) <= start(bool));
+    b(bool) = (!i(int));
+    b(bool) = (i(int) && start(bool));
+    b(bool) = (i(int) || start(bool));
+    if (i(int)) {
+    }
+    while (i(int)) {
+    }
+    repeat (start(bool)) {
+    }
+    repeat ("not an int") {
+    }
+    if ((e(int) == true)) {
+    }
+    e(int) = true;
+    if ((f(int)() == g(->void)())) {
+    }
+    if ((car(->bool) == hat(->int))) {
+    }
+    if ((car(->bool) != hat(->int))) {
+    }
+    if ((bowler(struct) == Player(struct))) {
+    }
+    if ((bowler(struct) != Player(struct))) {
+    }
+    if ((bowlerHatMan(bowler) == Ibra(Player))) {
+    }
+    if ((bowlerHatMan(bowler) != Ibra(Player))) {
+    }
+    hat(->int) = car(->bool);
+    bowler(struct) = Player(struct);
+    bowlerHatMan(bowler) = Ibra(Player);
+    bowlerHatMan(bowler).bowlingBalls(int) = 3;
+    b(bool) = (bowlerHatMan(bowler).bowlingBalls(int) && false);
+}
+
