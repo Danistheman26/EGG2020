@@ -1,0 +1,81 @@
+struct bowler{
+    int bowlingBalls;
+};
+
+struct Player{
+    struct bowler bowlingGuy;
+    bool dead;
+};
+
+int y;
+int j;
+bool shoes(bool color) {
+    bool blue;
+    blue(bool) = color(bool);
+    if (blue(bool)) {
+        return true;
+    }
+    return false;
+}
+
+int numShoes(int num) {
+    int total;
+    int surplus;
+    surplus(int) = ((2 * num(int)) + 10);
+    total(int) = (surplus(int) - num(int));
+    return total(int);
+}
+
+void getShoes(int num) {
+    bool color;
+    bool colorShoes;
+    int numberShoes;
+    color(bool) = false;
+    numberShoes(int) = numShoes(int->int)(num(int));
+    colorShoes(bool) = shoes(bool->bool)(color(bool));
+    color(bool) = (colorShoes(bool) = false);
+    return;
+}
+
+int jake() {
+    bool start;
+    int e;
+    int i;
+    int g;
+    bool b;
+    struct bowler bowlerHatMan;
+    struct Player Ibra;
+    start(bool) = false;
+    start(bool) = true;
+    i(int) = 0;
+    g(int) = 1;
+    e(int) = (i(int) + g(int));
+    e(int) = (i(int) - g(int));
+    e(int) = (i(int) * g(int));
+    e(int) = (i(int) / g(int));
+    g(int)++;
+    g(int)--;
+    e(int) = (i(int) > g(int));
+    e(int) = (i(int) < g(int));
+    e(int) = (i(int) >= g(int));
+    e(int) = (i(int) <= g(int));
+    b(bool) = (!start(bool));
+    b(bool) = (true && start(bool));
+    b(bool) = (false || start(bool));
+    if (start(bool)) {
+    }
+    while (start(bool)) {
+    }
+    repeat (i(int)) {
+    }
+    if ((start(bool) == true)) {
+    }
+    b(bool) = true;
+    b(bool) = shoes(bool->bool)(start(bool));
+    bowlerHatMan(bowler).bowlingBalls(int) = 3;
+    Ibra(Player).bowlingGuy(bowler).bowlingBalls(int) = 4;
+    Ibra(Player).dead(bool) = false;
+    e(int) = (i(int) + bowlerHatMan(bowler).bowlingBalls(int));
+    b(bool) = (true && Ibra(Player).dead(bool));
+}
+

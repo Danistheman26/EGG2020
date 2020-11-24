@@ -3,6 +3,7 @@ struct bowler {
   int bowlingBalls;
 };
 struct Player {
+  struct bowler bowlingGuy;
   bool dead;
 };
 int tryToWriteReadMe() {
@@ -100,12 +101,13 @@ int TestsForErrors(){
   
   if(bowlerHatMan == Ibra){}
   if(bowlerHatMan != Ibra){}
-  
+ 
   hat = car;
   bowler = Player;
   bowlerHatMan = Ibra;
   
   bowlerHatMan.bowlingBalls = 3;
+  Ibra.bowlingGuy.bowlingBalls = true;
   b = bowlerHatMan.bowlingBalls && false;
   
 }

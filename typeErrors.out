@@ -3,6 +3,7 @@ struct bowler{
 };
 
 struct Player{
+    struct bowler bowlingGuy;
     bool dead;
 };
 
@@ -109,6 +110,7 @@ int TestsForErrors() {
     bowler(struct) = Player(struct);
     bowlerHatMan(bowler) = Ibra(Player);
     bowlerHatMan(bowler).bowlingBalls(int) = 3;
+    Ibra(Player).bowlingGuy(bowler).bowlingBalls(int) = true;
     b(bool) = (bowlerHatMan(bowler).bowlingBalls(int) && false);
 }
 

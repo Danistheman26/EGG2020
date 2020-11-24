@@ -3,6 +3,7 @@ struct bowler {
   int bowlingBalls;
 };
 struct Player {
+  struct bowler bowlingGuy;
   bool dead;
 };
 
@@ -72,6 +73,7 @@ int jake(){
   b = shoes(start);
   
   bowlerHatMan.bowlingBalls = 3;
+  Ibra.bowlingGuy.bowlingBalls = 4;
   Ibra.dead = false;
   e = (i + bowlerHatMan.bowlingBalls);
   b = (true && Ibra.dead);
