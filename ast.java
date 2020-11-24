@@ -1736,9 +1736,12 @@ class DotAccessExpNode extends ExpNode {
      * typeCheck
      */
     public typeClassRet typeCheck(SymTable symTab) {
-		
-		SymTable inStruct = ((StructSym)myStmtTable.lookupGlobal(((IdNode)myLoc).myStrVal())).getParams();
-		Type exp = inStruct.lookupLocal(myId.myStrVal()).getType();
+    	Type exp =  null;
+		if(myLoc instanceof IdNode){
+			SymTable inStruct = ((StructDefSym)symTab.lookupGlobal(((IdNode)myLoc).name())).getSymTable();
+			exp = inStruct.lookupLocal(myId.name()).getType();
+		}
+		else{ }
 		
 		return new typeClassRet(exp, myId.lineNum(), myId.charNum());
 	}
