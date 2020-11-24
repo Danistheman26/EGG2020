@@ -1740,11 +1740,18 @@ class DotAccessExpNode extends ExpNode {
 		if(myLoc instanceof IdNode){
 			SymTable inStruct = ((StructDefSym)symTab.lookupGlobal(((IdNode)myLoc).name())).getSymTable();
 			exp = inStruct.lookupLocal(myId.name()).getType();
+		} else {
+			IdNode locId = ((DotAccessExpNode)myLoc).getId();
+			SymTable myLocTable = ((StructDefSym)locId).getSymTable();
+			exp = myLocTable.lookupLocal(myId.name()).getType();
 		}
-		else{ }
 		
 		return new typeClassRet(exp, myId.lineNum(), myId.charNum());
 	}
+	
+	public IdNode getId(){
+    	return myId;
+    }
 
     public void unparse(PrintWriter p, int indent) {
         myLoc.unparse(p, 0);
