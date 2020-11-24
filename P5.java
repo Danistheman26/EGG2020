@@ -143,7 +143,6 @@ public class P5 {
 		}
 		
 		astRoot.nameAnalysis();  // perform name analysis
-		System.out.print(ErrMsg.getErr());
 		if (!ErrMsg.getErr()){
 			astRoot.typeCheck();
 		}
