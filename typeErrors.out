@@ -49,12 +49,13 @@ int TestsForErrors() {
     int i;
     int e;
     bool b;
-    int f;
     bool start;
+    int f;
     struct bowler bowlerHatMan;
     struct Player Ibra;
     i(int) = 0;
     e(int) = 8;
+    f(int) = 3;
     start(bool) = false;
     b(bool) = false;
     cout << tryToWriteReadMe(->int);
@@ -64,24 +65,41 @@ int TestsForErrors() {
     cin >> tryToWriteReadMe(->int);
     cin >> bowler(struct);
     cin >> bowlerHatMan(bowler);
+    cin >> Ibra(Player).bowlingGuy(bowler);
     e(int) = b(bool)();
     e(int) = b(bool)(3);
     e(int) = wrongParams(int,bool->int)(3);
-    e(int) = wrongParams(int,bool->int)(3, 4);
+    e(int) = wrongParams(int,bool->int)(3, b(bool), start(bool));
+    e(int) = wrongParams(int,bool->int)(b(bool), 4);
     e(int) = (i(int) + start(bool));
     e(int) = (i(int) - start(bool));
     e(int) = (i(int) * start(bool));
     e(int) = (i(int) / start(bool));
+    e(int) = (start(bool) + start(bool));
+    e(int) = (i(int) + (b(bool) && start(bool)));
+    e(int) = ((i(int) + b(bool)) + (i(int) && b(bool)));
+    e(int) = (((i(int) + start(bool)) + ((i(int) * (b(bool) == false)) && false)) + start(bool));
     start(bool)++;
     start(bool)--;
+    b(bool) = (start(bool) + (start(bool) + false));
     b(bool) = (i(int) > start(bool));
     b(bool) = (i(int) < start(bool));
     b(bool) = (i(int) >= start(bool));
     b(bool) = (i(int) <= start(bool));
+    b(bool) = (i(int) > (i(int) < start(bool)));
+    b(bool) = (start(bool) > false);
+    b(bool) = (start(bool) < (start(bool) > false));
     b(bool) = (!i(int));
     b(bool) = (i(int) && start(bool));
     b(bool) = (i(int) || start(bool));
+    b(bool) = (i(int) && (i(int) && 3));
     if (i(int)) {
+    }
+    if ((i(int) && b(bool))) {
+    }
+    if ((i(int) + b(bool))) {
+    }
+    if (((i(int) + e(int)) == 3)) {
     }
     while (i(int)) {
     }
@@ -92,7 +110,14 @@ int TestsForErrors() {
     if ((e(int) == true)) {
     }
     e(int) = true;
+    e(int) = (i(int) + b(bool));
+    e(int) = (i(int) + hat(->int)());
+    e(int) = (i(int) + car(->bool)());
+    b(bool) = (i(int) + car(->bool)());
+    b(bool) = (i(int) + hat(->int)());
     if ((f(int)() == g(->void)())) {
+    }
+    if ((f(int)() == car(->bool)())) {
     }
     if ((car(->bool) == hat(->int))) {
     }
@@ -102,15 +127,24 @@ int TestsForErrors() {
     }
     if ((bowler(struct) != Player(struct))) {
     }
+    if ((hat(->int)() == noReturn(->int)())) {
+    }
+    if ((hat(->int)() == bowlerHatMan(bowler).bowlingBalls(int))) {
+    }
     if ((bowlerHatMan(bowler) == Ibra(Player))) {
     }
     if ((bowlerHatMan(bowler) != Ibra(Player))) {
     }
     hat(->int) = car(->bool);
     bowler(struct) = Player(struct);
+    hat(->int) = i(int);
     bowlerHatMan(bowler) = Ibra(Player);
     bowlerHatMan(bowler).bowlingBalls(int) = 3;
     Ibra(Player).bowlingGuy(bowler).bowlingBalls(int) = true;
     b(bool) = (bowlerHatMan(bowler).bowlingBalls(int) && false);
+}
+
+int george() {
+    f(->void)();
 }
 
