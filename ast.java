@@ -615,7 +615,6 @@ class FnDeclNode extends DeclNode {
      */
     public void typeCheck(SymTable symTab) {
     	Type idType = ((FnSym)myId.sym()).getReturnType();
-    	System.out.println("fndecl type:" + idType);
     	myBody.typeCheck(symTab, idType);
     }
 
@@ -1869,7 +1868,6 @@ class CallExpNode extends ExpNode {
      */
     public typeClassRet typeCheck(SymTable symTab) {
 		typeClassRet id = myId.typeCheck(symTab);
-		System.out.println("fnCall type:" + id.getType());
 		// check if id is a non function type 
 		if (!id.getType().isFnType() && !id.getType().isVoidType()) {
 			ErrMsg.fatal(id.getLN(), id.getCN(), "Attempt to call a non-function");
