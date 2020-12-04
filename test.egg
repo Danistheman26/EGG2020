@@ -1,0 +1,6 @@
+int j;
+
+void main(){
+	int k;
+	k=0;
+}
