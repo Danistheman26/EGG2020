@@ -135,6 +135,13 @@ class ProgramNode extends ASTnode {
     public void nameAnalysis() {
         SymTable symTab = new SymTable();
         myDeclList.nameAnalysis(symTab);
+		
+		sym = globalTab.lookupGlobal("main");
+		
+		// check if funciton named main
+		if (sym == null || !(sym instanceof FnSym)) {
+			ErrMsg.fatal(0 0, "No main function");
+		}
     }
     
     /**
