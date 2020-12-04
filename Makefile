@@ -1,7 +1,4 @@
 ###
-# This Makefile can be used to make a parser for the egg language
-# (parser.class) and to make a program (P5.class) that tests the parser and
-# the unparse methods in ast.java.
 #
 # make clean removes all generated files.
 #
@@ -11,8 +8,8 @@ JC = javac
 
 CP = ./deps:.
 
-P5.class: P5.java parser.class Yylex.class ASTnode.class
-	$(JC) -g -cp $(CP) P5.java
+P6.class: P6.java parser.class Yylex.class ASTnode.class
+	$(JC) -g -cp $(CP) P6.java
 
 parser.class: parser.java ASTnode.class Yylex.class ErrMsg.class
 	$(JC) -g -cp $(CP) parser.java
@@ -44,8 +41,8 @@ Sym.class: Sym.java Type.class ast.java
 SymTable.class: SymTable.java Sym.class DuplicateSymException.class EmptySymTableException.class WrongArgumentException.class
 	$(JC) -g -cp $(CP) SymTable.java
 
-Type.class: Type.java
-	$(JC) -g -cp $(CP) Type.java ast.java
+Type.class: Type.java ast.java Sym.java
+	$(JC) -g -cp $(CP) Type.java ast.java Sym.java
 
 WrongArgumentException.class: WrongArgumentException.java
 	$(JC) -g -cp $(CP) WrongArgumentException.java
@@ -60,8 +57,8 @@ EmptySymTableException.class: EmptySymTableException.java
 # test
 #
 test:
-	java -cp $(CP) P5 test.egg test.out
-	java -cp $(CP) P5 typeErrors.egg typeErrors.out
+	java -cp $(CP) P6 test.egg test.s
+
 ###
 # clean
 ###
@@ -69,4 +66,4 @@ clean:
 	rm -f *~ *.class parser.java egg.jlex.java sym.java
 
 cleantest:
-	rm -f test.out
+	rm -f test.s
