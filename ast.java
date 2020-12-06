@@ -455,10 +455,10 @@ class VarDeclNode extends DeclNode {
         if (!badDecl) {  // insert into symbol table
             try {
                 if (myType instanceof StructNode) {
-                    sym = new StructSym(structId);
+                    sym = new StructSym(structId, 4, true);
                 }
                 else {
-                    sym = new Sym(myType.type());
+                    sym = new Sym(myType.type(), 4, true);	// FIXME
                 }
                 symTab.addDecl(name, sym);
                 myId.link(sym);
@@ -531,7 +531,7 @@ class FnDeclNode extends DeclNode {
         
         else { // add function name to local symbol table
             try {
-                sym = new FnSym(myType.type(), myFormalsList.length());
+                sym = new FnSym(myType.type(), myFormalsList.length(), 4, true); // FIXME
                 symTab.addDecl(name, sym);
                 myId.link(sym);
             } catch (DuplicateSymException ex) {
@@ -629,7 +629,7 @@ class FormalDeclNode extends DeclNode {
         
         if (!badDecl) {  // insert into symbol table
             try {
-                sym = new Sym(myType.type());
+                sym = new Sym(myType.type() 4, true);  //FIXME
                 symTab.addDecl(name, sym);
                 myId.link(sym);
             } catch (DuplicateSymException ex) {
@@ -694,7 +694,7 @@ class StructDeclNode extends DeclNode {
         
         if (!badDecl) {
             try {   // add entry to symbol table
-                StructDefSym sym = new StructDefSym(structSymTab);
+                StructDefSym sym = new StructDefSym(structSymTab, 4, true); // FIXME
                 symTab.addDecl(name, sym);
                 myId.link(sym);
             } catch (DuplicateSymException ex) {

@@ -6,12 +6,24 @@ import java.util.*;
  */
 public class Sym {
     private Type type;
+	private int offset;
+	private boolean global;
     
-    public Sym(Type type) {
+    public Sym(Type type, int offset, boolean global) {
         this.type = type;
+		this.offset = offset;
+		this.global = global;
+    }
+	
+	public boolean isGlobal() {
+        return global;
     }
     
-    public Type getType() {
+    public int getOffset() {
+        return offset;
+    }
+	
+	public Type getType() {
         return type;
     }
     
@@ -31,8 +43,8 @@ class FnSym extends Sym {
     private int numParams;
     private List<Type> paramTypes;
     
-    public FnSym(Type type, int numparams) {
-        super(new FnType());
+    public FnSym(Type type, int numparams, int offset, boolean global) {
+        super(new FnType(), offset, global);
         returnType = type;
         numParams = numparams;
     }
@@ -80,8 +92,8 @@ class StructSym extends Sym {
     // new fields
     private IdNode structType;  // name of the struct type
     
-    public StructSym(IdNode id) {
-        super(new StructType(id));
+    public StructSym(IdNode id, int offset, boolean global) {
+        super(new StructType(id), offset, global);
         structType = id;
     }
 
@@ -100,8 +112,8 @@ class StructDefSym extends Sym {
     // new fields
     private SymTable symTab;
     
-    public StructDefSym(SymTable table) {
-        super(new StructDefType());
+    public StructDefSym(SymTable table, int offset, boolean global) {
+        super(new StructDefType(), offset, global);
         symTab = table;
     }
 
