@@ -1,6 +1,20 @@
 int j;
-
+int f(int l, int m){
+	int purple;
+		l = 1;
+		m = 3;
+		purple = 69;
+		j = 5;
+		return m;
+	}
 void main(){
 	int k;
+	int p;
+	
 	k=0;
+	j = 9;
+	
+	p = f(j, k);
 }
+
+

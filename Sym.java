@@ -6,7 +6,7 @@ import java.util.*;
  */
 public class Sym {
     private Type type;
-	private int offset;
+	private int offset = 0;
 	private boolean global;
     
     public Sym(Type type, int offset, boolean global) {
@@ -27,8 +27,12 @@ public class Sym {
         return type;
     }
     
+    public void setOffset(int newOffset){
+    	offset = newOffset;
+    }
+    
     public String toString() {
-        return type.toString() + ", " + global;
+        return type.toString() + ", " + global + ", " + offset;
     }
 }
 
@@ -42,6 +46,8 @@ class FnSym extends Sym {
     private Type returnType;
     private int numParams;
     private List<Type> paramTypes;
+    private int formalsOffset;
+    private int localsOffset;
     
     public FnSym(Type type, int numparams, int offset, boolean global) {
         super(new FnType(), offset, global);
@@ -64,7 +70,24 @@ class FnSym extends Sym {
     public List<Type> getParamTypes() {
         return paramTypes;
     }
-
+    
+    public void setFormalsOffset(int newOffset){
+    	formalsOffset = newOffset;
+    }
+    
+    public int getformalsOffset(){
+    	return formalsOffset;
+    }
+    
+    public void setLocalsOffset(int newOffset){
+    	localsOffset = newOffset;
+    }
+    
+    public int getLocalsOffset(){
+    	return localsOffset;
+    }
+    
+    
     public String toString() {
         // make list of formals
         String str = "";
@@ -78,6 +101,7 @@ class FnSym extends Sym {
         }
 
         str += "->" + returnType.toString();
+        str += ", " + localsOffset + ", " + formalsOffset;
         return str;
     }
 }

@@ -170,7 +170,7 @@ class DeclListNode extends ASTnode {
      */
     public void nameAnalysis(SymTable symTab, boolean global) {
 		if (global) {
-			nameAnalysis(symTab, symTab, true)
+			nameAnalysis(symTab, symTab, true);
 		} else {
 			nameAnalysis(symTab, symTab);
 	    }
@@ -183,9 +183,12 @@ class DeclListNode extends ASTnode {
      * decls in the list.
      */    
     public void nameAnalysis(SymTable symTab, SymTable globalTab) {
+    	int localOffset = 0;
         for (DeclNode node : myDecls) {
+            localOffset -= 4;
             if (node instanceof VarDeclNode) {
-                ((VarDeclNode)node).nameAnalysis(symTab, globalTab, false);
+                Sym sym = ((VarDeclNode)node).nameAnalysis(symTab, globalTab, false);
+                sym.setOffset(localOffset);
             } else {
                 node.nameAnalysis(symTab, false);
             }
@@ -216,7 +219,9 @@ class DeclListNode extends ASTnode {
             node.typeCheck();
         }
     }
-    
+    public List<DeclNode> getDeclList(){
+    	return myDecls;
+    }
     public void unparse(PrintWriter p, int indent) {
         Iterator it = myDecls.iterator();
         try {
@@ -234,6 +239,7 @@ class DeclListNode extends ASTnode {
 }
 
 class FormalsListNode extends ASTnode {
+    int formalsOffset = 0;
     public FormalsListNode(List<FormalDeclNode> S) {
         myFormals = S;
     }
@@ -251,6 +257,8 @@ class FormalsListNode extends ASTnode {
             Sym sym = node.nameAnalysis(symTab);
             if (sym != null) {
                 typeList.add(sym.getType());
+                formalsOffset += 4;
+                sym.setOffset(formalsOffset);
             }
         }
         return typeList;
@@ -261,6 +269,10 @@ class FormalsListNode extends ASTnode {
      */
     public int length() {
         return myFormals.size();
+    }
+    
+    public int getFormalsOffset(){
+    	return formalsOffset;
     }
     
     public void unparse(PrintWriter p, int indent) {
@@ -300,7 +312,14 @@ class FnBodyNode extends ASTnode {
      */
     public void typeCheck(Type retType) {
         myStmtList.typeCheck(retType);
-    }    
+    }
+    public String getDeclListFinalId(){
+    	List<DeclNode> myList = myDeclList.getDeclList();
+    	if(myList.size() == 0){
+    		return null;
+    	}
+    	return ((VarDeclNode)myList.get(myList.size()-1)).getDeclId().name();
+    }
           
     public void unparse(PrintWriter p, int indent) {
         myDeclList.unparse(p, indent);
@@ -414,6 +433,7 @@ abstract class DeclNode extends ASTnode {
      * Note: a formal decl needs to return a sym
      */
     abstract public Sym nameAnalysis(SymTable symTab);
+    abstract public Sym nameAnalysis(SymTable symTab, boolean global);
 
     // default version of typeCheck for non-function decls
     public void typeCheck() { }
@@ -444,6 +464,7 @@ class VarDeclNode extends DeclNode {
     public Sym nameAnalysis(SymTable symTab) {
         return nameAnalysis(symTab, symTab, false);
     }
+    public Sym nameAnalysis(SymTable symTab, boolean global) {return null;} //needed for abstract
     
     public Sym nameAnalysis(SymTable symTab, SymTable globalTab, boolean global) {
         boolean badDecl = false;
@@ -482,10 +503,10 @@ class VarDeclNode extends DeclNode {
         if (!badDecl) {  // insert into symbol table
             try {
                 if (myType instanceof StructNode) {
-                    sym = new StructSym(structId, 4, global);	// FIXME
+                    sym = new StructSym(structId, 0, global);	// FIXME
                 }
                 else {
-                    sym = new Sym(myType.type(), 4, global);	// FIXME
+                    sym = new Sym(myType.type(), 0, global);	// FIXME
                 }
                 symTab.addDecl(name, sym);
                 myId.link(sym);
@@ -513,6 +534,10 @@ class VarDeclNode extends DeclNode {
         p.print(" ");
         p.print(myId.name());
         p.println(";");
+    }
+    
+    public IdNode getDeclId(){
+    	return myId;
     }
 
     // 3 kids
@@ -558,7 +583,7 @@ class FnDeclNode extends DeclNode {
         
         else { // add function name to local symbol table
             try {
-                sym = new FnSym(myType.type(), myFormalsList.length(), 4, global); // FIXME
+                sym = new FnSym(myType.type(), myFormalsList.length(), 0, global); // FIXME
                 symTab.addDecl(name, sym);
                 myId.link(sym);
             } catch (DuplicateSymException ex) {
@@ -583,9 +608,17 @@ class FnDeclNode extends DeclNode {
         if (sym != null) {
             sym.addFormals(typeList);
         }
-        
+        sym.setFormalsOffset(myFormalsList.getFormalsOffset());
+        //TODO set offset for formals(update fp and sp)
         myBody.nameAnalysis(symTab); // process the function body
-        
+        int localsOffset;
+        if(myBody.getDeclListFinalId() != null){
+            localsOffset = symTab.lookupLocal(myBody.getDeclListFinalId()).getOffset();
+        	}
+        else{
+            localsOffset = 0;
+        }
+        sym.setLocalsOffset(localsOffset); //get offset from declList
         try {
             symTab.removeScope();  // exit scope
         } catch (EmptySymTableException ex) {
@@ -596,6 +629,7 @@ class FnDeclNode extends DeclNode {
         
         return null;
     } 
+    public Sym nameAnalysis(SymTable symTab) {return null;} //needed for abstract
        
     /**
      * typeCheck
@@ -656,7 +690,7 @@ class FormalDeclNode extends DeclNode {
         
         if (!badDecl) {  // insert into symbol table
             try {
-                sym = new Sym(myType.type() 4, false);  //FIXME
+                sym = new Sym(myType.type(), 0, false);  //FIXME
                 symTab.addDecl(name, sym);
                 myId.link(sym);
             } catch (DuplicateSymException ex) {
@@ -676,6 +710,7 @@ class FormalDeclNode extends DeclNode {
         
         return sym;
     }    
+    public Sym nameAnalysis(SymTable symTab, boolean global) {return null;} //not needed
     
     public void unparse(PrintWriter p, int indent) {
         myType.unparse(p, 0);
@@ -721,7 +756,7 @@ class StructDeclNode extends DeclNode {
         
         if (!badDecl) {
             try {   // add entry to symbol table
-                StructDefSym sym = new StructDefSym(structSymTab, 4, true); // FIXME
+                StructDefSym sym = new StructDefSym(structSymTab, 0, true); // FIXME
                 symTab.addDecl(name, sym);
                 myId.link(sym);
             } catch (DuplicateSymException ex) {
@@ -740,7 +775,9 @@ class StructDeclNode extends DeclNode {
         }
         
         return null;
-    }    
+    }  
+    
+    public Sym nameAnalysis(SymTable symTab, boolean global) {return null;} //needed for abstract  
     
     public void unparse(PrintWriter p, int indent) {
         addIndent(p, indent);

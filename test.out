@@ -1,0 +1,18 @@
+int j;
+int f(int l, int m) {
+    int purple;
+    l(int, false, 4) = 1;
+    m(int, false, 8) = 3;
+    purple(int, false, -4) = 69;
+    j(int, true, 0) = 5;
+    return m(int, false, 8);
+}
+
+void main() {
+    int k;
+    int p;
+    k(int, false, -4) = 0;
+    j(int, true, 0) = 9;
+    p(int, false, -8) = f(int,int->int, -4, 8)(j(int, true, 0), k(int, false, -4));
+}
+
