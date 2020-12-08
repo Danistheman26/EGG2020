@@ -134,7 +134,7 @@ class ProgramNode extends ASTnode {
      */
     public void nameAnalysis() {
         SymTable symTab = new SymTable();
-        myDeclList.nameAnalysis(symTab);
+        myDeclList.nameAnalysis(symTab, true);
         
         Sym sym = symTab.lookupGlobal("main");
 		
@@ -168,9 +168,13 @@ class DeclListNode extends ASTnode {
      * nameAnalysis
      * Given a symbol table symTab, process all of the decls in the list.
      */
-    public void nameAnalysis(SymTable symTab) {
-        nameAnalysis(symTab, symTab);
-    }
+    public void nameAnalysis(SymTable symTab, boolean global) {
+		if (global) {
+			nameAnalysis(symTab, symTab, true)
+		} else {
+			nameAnalysis(symTab, symTab);
+	    }
+	}
     
     /**
      * nameAnalysis
@@ -181,12 +185,28 @@ class DeclListNode extends ASTnode {
     public void nameAnalysis(SymTable symTab, SymTable globalTab) {
         for (DeclNode node : myDecls) {
             if (node instanceof VarDeclNode) {
-                ((VarDeclNode)node).nameAnalysis(symTab, globalTab);
+                ((VarDeclNode)node).nameAnalysis(symTab, globalTab, false);
             } else {
-                node.nameAnalysis(symTab);
+                node.nameAnalysis(symTab, false);
             }
         }
-    }    
+    }
+	
+	/**
+     * nameAnalysis
+     * Given a symbol table symTab and a global symbol table globalTab
+     * (for processing struct names in variable decls), process all of the 
+     * decls in the list.
+     */    
+    public void nameAnalysis(SymTable symTab, SymTable globalTab, boolean global) {
+        for (DeclNode node : myDecls) {
+            if (node instanceof VarDeclNode) {
+                ((VarDeclNode)node).nameAnalysis(symTab, globalTab, global);
+            } else {
+                node.nameAnalysis(symTab, global);
+            }
+        }
+    } 
     
     /**
      * typeCheck
@@ -271,7 +291,7 @@ class FnBodyNode extends ASTnode {
      * - process the statement list
      */
     public void nameAnalysis(SymTable symTab) {
-        myDeclList.nameAnalysis(symTab);
+        myDeclList.nameAnalysis(symTab, false);
         myStmtList.nameAnalysis(symTab);
     }    
  
@@ -422,10 +442,10 @@ class VarDeclNode extends DeclNode {
      * symTab and globalTab can be the same
      */
     public Sym nameAnalysis(SymTable symTab) {
-        return nameAnalysis(symTab, symTab);
+        return nameAnalysis(symTab, symTab, false);
     }
     
-    public Sym nameAnalysis(SymTable symTab, SymTable globalTab) {
+    public Sym nameAnalysis(SymTable symTab, SymTable globalTab, boolean global) {
         boolean badDecl = false;
         String name = myId.name();
         Sym sym = null;
@@ -462,10 +482,10 @@ class VarDeclNode extends DeclNode {
         if (!badDecl) {  // insert into symbol table
             try {
                 if (myType instanceof StructNode) {
-                    sym = new StructSym(structId, 4, true);
+                    sym = new StructSym(structId, 4, global);	// FIXME
                 }
                 else {
-                    sym = new Sym(myType.type(), 4, true);	// FIXME
+                    sym = new Sym(myType.type(), 4, global);	// FIXME
                 }
                 symTab.addDecl(name, sym);
                 myId.link(sym);
@@ -527,7 +547,7 @@ class FnDeclNode extends DeclNode {
      *     process the body of the function
      *     exit scope
      */
-    public Sym nameAnalysis(SymTable symTab) {
+    public Sym nameAnalysis(SymTable symTab, boolean global) {
         String name = myId.name();
         FnSym sym = null;
         
@@ -538,7 +558,7 @@ class FnDeclNode extends DeclNode {
         
         else { // add function name to local symbol table
             try {
-                sym = new FnSym(myType.type(), myFormalsList.length(), 4, true); // FIXME
+                sym = new FnSym(myType.type(), myFormalsList.length(), 4, global); // FIXME
                 symTab.addDecl(name, sym);
                 myId.link(sym);
             } catch (DuplicateSymException ex) {
@@ -636,7 +656,7 @@ class FormalDeclNode extends DeclNode {
         
         if (!badDecl) {  // insert into symbol table
             try {
-                sym = new Sym(myType.type() 4, true);  //FIXME
+                sym = new Sym(myType.type() 4, false);  //FIXME
                 symTab.addDecl(name, sym);
                 myId.link(sym);
             } catch (DuplicateSymException ex) {
@@ -1044,7 +1064,7 @@ class IfStmtNode extends StmtNode {
     public void nameAnalysis(SymTable symTab) {
         myExp.nameAnalysis(symTab);
         symTab.addScope();
-        myDeclList.nameAnalysis(symTab);
+        myDeclList.nameAnalysis(symTab, false);
         myStmtList.nameAnalysis(symTab);
         try {
             symTab.removeScope();
@@ -1111,7 +1131,7 @@ class IfElseStmtNode extends StmtNode {
     public void nameAnalysis(SymTable symTab) {
         myExp.nameAnalysis(symTab);
         symTab.addScope();
-        myThenDeclList.nameAnalysis(symTab);
+        myThenDeclList.nameAnalysis(symTab, false);
         myThenStmtList.nameAnalysis(symTab);
         try {
             symTab.removeScope();
@@ -1121,7 +1141,7 @@ class IfElseStmtNode extends StmtNode {
             System.exit(-1);        
         }
         symTab.addScope();
-        myElseDeclList.nameAnalysis(symTab);
+        myElseDeclList.nameAnalysis(symTab, false);
         myElseStmtList.nameAnalysis(symTab);
         try {
             symTab.removeScope();
@@ -1190,7 +1210,7 @@ class WhileStmtNode extends StmtNode {
     public void nameAnalysis(SymTable symTab) {
         myExp.nameAnalysis(symTab);
         symTab.addScope();
-        myDeclList.nameAnalysis(symTab);
+        myDeclList.nameAnalysis(symTab, false);
         myStmtList.nameAnalysis(symTab);
         try {
             symTab.removeScope();
@@ -1250,7 +1270,7 @@ class RepeatStmtNode extends StmtNode {
     public void nameAnalysis(SymTable symTab) {
         myExp.nameAnalysis(symTab);
         symTab.addScope();
-        myDeclList.nameAnalysis(symTab);
+        myDeclList.nameAnalysis(symTab, false);
         myStmtList.nameAnalysis(symTab);
         try {
             symTab.removeScope();

@@ -28,7 +28,7 @@ public class Sym {
     }
     
     public String toString() {
-        return type.toString();
+        return type.toString() + ", " + global;
     }
 }
 
