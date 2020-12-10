@@ -8,11 +8,26 @@ void main() {
     bool m;
     bool n;
     
-    l = !true;
-    m = !false;
+    l = 4 != 3;
+    m = false != true;
+    n = 4 != 4;
+   
     cout << l;
     cout << "\n";
     cout << m;
+    cout << "\n";
+    cout << n;
+    cout << "\n";
+    
+    l = 4 == 3;
+    m = false == true;
+    n = 4 == 4;
+   
+    cout << l;
+    cout << "\n";
+    cout << m;
+    cout << "\n";
+    cout << n;
     cout << "\n";
     
     
