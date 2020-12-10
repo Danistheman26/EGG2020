@@ -40,12 +40,12 @@ import java.util.*;
 //       StructNode        IdNode
 //
 //     StmtNode:
-//       AssignStmtNode      AssignNode
+//       -AssignStmtNode      AssignNode
 //       PostIncStmtNode     ExpNode
 //       PostDecStmtNode     ExpNode
 //       ReadStmtNode        ExpNode
-//       WriteStmtNode       ExpNode
-//       IfStmtNode          ExpNode, DeclListNode, StmtListNode
+//       -WriteStmtNode       ExpNode
+//       -IfStmtNode          ExpNode, DeclListNode, StmtListNode
 //       IfElseStmtNode      ExpNode, DeclListNode, StmtListNode,
 //                                    DeclListNode, StmtListNode
 //       WhileStmtNode       ExpNode, DeclListNode, StmtListNode
@@ -54,24 +54,24 @@ import java.util.*;
 //       ReturnStmtNode      ExpNode
 //
 //     ExpNode:
-//       IntLitNode          -- none --
-//       StrLitNode          -- none --
-//       TrueNode            -- none --
-//       FalseNode           -- none --
-//       IdNode              -- none --
-//       DotAccessNode       ExpNode, IdNode
-//       AssignNode          ExpNode, ExpNode
+//       -IntLitNode          -- none --
+//       -StrLitNode          -- none --
+//       -TrueNode            -- none --
+//       -FalseNode           -- none --
+//       -IdNode              -- none --
+//       -DotAccessNode       ExpNode, IdNode
+//       -AssignNode          ExpNode, ExpNode
 //       CallExpNode         IdNode, ExpListNode
 //       UnaryExpNode        ExpNode
 //         UnaryMinusNode
 //         NotNode
 //       BinaryExpNode       ExpNode ExpNode
-//         PlusNode     
-//         MinusNode
-//         TimesNode
-//         DivideNode
-//         AndNode
-//         OrNode
+//         -PlusNode     
+//         -MinusNode
+//         -TimesNode
+//         -DivideNode
+//         -AndNode
+//         -OrNode
 //         EqualsNode
 //         NotEqualsNode
 //         LessNode
@@ -1246,6 +1246,15 @@ class IfStmtNode extends StmtNode {
     }
     
     public void codeGen(String retLabel){
+    String label = Codegen.nextLabel();
+    myExp.codeGen();
+    Codegen.genPop("$t0");
+    Codegen.generate("beq", "$t0", "0", label);
+    myDeclList.codeGen();
+    myStmtList.codeGen("retLabel");
+    
+    Codegen.genLabel(label);
+    
     
     }
 
@@ -2342,6 +2351,27 @@ class NotNode extends UnaryExpNode {
         myExp.unparse(p, 0);
         p.print(")");
     }
+    
+    public Type codeGen(){
+    // step 1: evaluate both operands
+    myExp.codeGen();
+    
+
+    // step 2: pop values in T1
+    Codegen.genPop("$t0");
+    
+    // step 3: do the AND (T0 = T0 > T1)
+    Codegen.generate("not", "$t0", "$t0");
+    Codegen.generate("and", "$t0", "$t0", "1");
+    
+    // step 4: push result
+    
+    Codegen.genPush("$t0");
+    return new BoolType();
+    
+    }
+    
+    
 }
 
 // **********************************************************************
@@ -2510,6 +2540,23 @@ class PlusNode extends ArithmeticExpNode {
         myExp2.unparse(p, 0);
         p.print(")");
     }
+    
+    public Type codeGen() {
+    // step 1: evaluate both operands
+    myExp1.codeGen();
+    myExp2.codeGen();
+
+    // step 2: pop values in T0 and T1
+    Codegen.genPop("$t1");
+     Codegen.genPop("$t0");
+    
+    // step 3: do the addition (T0 = T0 + T1)
+     Codegen.generate("add", "$t0", "$t0", "$t1");
+    
+    // step 4: push result
+     Codegen.genPush("$t0");
+    return new IntType();
+    }
 }
 
 class MinusNode extends ArithmeticExpNode {
@@ -2523,6 +2570,23 @@ class MinusNode extends ArithmeticExpNode {
         p.print(" - ");
         myExp2.unparse(p, 0);
         p.print(")");
+    }
+    
+    public Type codeGen() {
+    // step 1: evaluate both operands
+    myExp1.codeGen();
+    myExp2.codeGen();
+
+    // step 2: pop values in T0 and T1
+    Codegen.genPop("$t1");
+     Codegen.genPop("$t0");
+    
+    // step 3: do the addition (T0 = T0 + T1)
+     Codegen.generate("sub", "$t0", "$t0", "$t1");
+    
+    // step 4: push result
+     Codegen.genPush("$t0");
+    return new IntType();
     }
 }
 
@@ -2539,6 +2603,25 @@ class TimesNode extends ArithmeticExpNode {
         myExp2.unparse(p, 0);
         p.print(")");
     }
+    
+     public Type codeGen() {
+    // step 1: evaluate both operands
+    myExp1.codeGen();
+    myExp2.codeGen();
+
+    // step 2: pop values in T0 and T1
+    Codegen.genPop("$t1");
+    Codegen.genPop("$t0");
+    
+    // step 3: do the Multiplication (T0 = T0 * T1)
+    Codegen.generate("mult", "$t0", "$t1");
+    
+    // step 4: push result
+    Codegen.generate("mflo", "$t0");
+    Codegen.genPush("$t0");
+    return new IntType();
+    }
+    
 }
 
 class DivideNode extends ArithmeticExpNode {
@@ -2552,6 +2635,24 @@ class DivideNode extends ArithmeticExpNode {
         p.print(" / ");
         myExp2.unparse(p, 0);
         p.print(")");
+    }
+    
+    public Type codeGen() {
+    // step 1: evaluate both operands
+    myExp1.codeGen();
+    myExp2.codeGen();
+
+    // step 2: pop values in T0 and T1
+    Codegen.genPop("$t1");
+    Codegen.genPop("$t0");
+    
+    // step 3: do the Multiplication (T0 = T0 * T1)
+    Codegen.generate("div", "$t0", "$t1");
+    
+    // step 4: push result
+    Codegen.generate("mflo", "$t0");
+    Codegen.genPush("$t0");
+    return new IntType();
     }
 }
 
@@ -2567,6 +2668,29 @@ class AndNode extends LogicalExpNode {
         myExp2.unparse(p, 0);
         p.print(")");
     }
+    
+     public Type codeGen() {
+    // step 1: evaluate both operands
+    String label = Codegen.nextLabel();
+    myExp1.codeGen();
+    Codegen.genPop("$t0");
+    Codegen.generate("beq", "$t0", "0", label);
+    myExp2.codeGen();
+    
+
+    // step 2: pop values in T1
+    Codegen.genPop("$t1");
+    
+    // step 3: do the AND (T0 = T0 && T1)
+    Codegen.generate("and", "$t0", "$t0", "$t1");
+    
+    Codegen.genLabel(label);
+    // step 4: push result
+    
+    Codegen.genPush("$t0");
+    return new IntType();
+    }
+    
 }
 
 class OrNode extends LogicalExpNode {
@@ -2580,6 +2704,28 @@ class OrNode extends LogicalExpNode {
         p.print(" || ");
         myExp2.unparse(p, 0);
         p.print(")");
+    }
+    
+    public Type codeGen() {
+    // step 1: evaluate both operands
+    String label = Codegen.nextLabel();
+    myExp1.codeGen();
+    Codegen.genPop("$t0");
+    Codegen.generate("beq", "$t0", "1", label);
+    myExp2.codeGen();
+    
+
+    // step 2: pop values in T1
+    Codegen.genPop("$t1");
+    
+    // step 3: do the AND (T0 = T0 && T1)
+    Codegen.generate("or", "$t0", "$t0", "$t1");
+    
+    Codegen.genLabel(label);
+    // step 4: push result
+    
+    Codegen.genPush("$t0");
+    return new BoolType();
     }
 }
 
@@ -2637,6 +2783,26 @@ class GreaterNode extends RelationalExpNode {
         myExp2.unparse(p, 0);
         p.print(")");
     }
+    
+    public Type codeGen(){
+    // step 1: evaluate both operands
+    myExp1.codeGen();
+    myExp2.codeGen();
+    
+
+    // step 2: pop values in T1
+    Codegen.genPop("$t0");
+    Codegen.genPop("$t1");
+    
+    // step 3: do the AND (T0 = T0 > T1)
+    Codegen.generate("slt", "$t0", "$t0", "$t1");
+    
+    // step 4: push result
+    
+    Codegen.genPush("$t0");
+    return new BoolType();
+    
+    }
 }
 
 class LessEqNode extends RelationalExpNode {
@@ -2651,6 +2817,27 @@ class LessEqNode extends RelationalExpNode {
         myExp2.unparse(p, 0);
         p.print(")");
     }
+    
+    public Type codeGen(){
+    // step 1: evaluate both operands
+    myExp1.codeGen();
+    myExp2.codeGen();
+    
+
+    // step 2: pop values in T1
+    Codegen.genPop("$t0");
+    Codegen.genPop("$t1");
+    
+    // step 3: do the AND (T0 = T0 > T1)
+    Codegen.generate("sub", "$t0", "$t0", "$t1");
+    Codegen.generate("slti", "$t0", "$t0", "0");
+    
+    // step 4: push result
+    
+    Codegen.genPush("$t0");
+    return new BoolType();
+    
+    }
 }
 
 class GreaterEqNode extends RelationalExpNode {
@@ -2664,5 +2851,26 @@ class GreaterEqNode extends RelationalExpNode {
         p.print(" >= ");
         myExp2.unparse(p, 0);
         p.print(")");
+    }
+    
+    public Type codeGen(){
+    // step 1: evaluate both operands
+    myExp1.codeGen();
+    myExp2.codeGen();
+    
+
+    // step 2: pop values in T1
+    Codegen.genPop("$t0");
+    Codegen.genPop("$t1");
+    
+    // step 3: do the AND (T0 = T0 > T1)
+    Codegen.generate("sub", "$t0", "$t0", "$t1");
+    Codegen.generate("slti", "$t0", "$t0", "1");
+    
+    // step 4: push result
+    
+    Codegen.genPush("$t0");
+    return new BoolType();
+    
     }
 }
