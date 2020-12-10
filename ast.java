@@ -1033,7 +1033,7 @@ class PostIncStmtNode extends StmtNode {
     	((IdNode)myExp).genAddr();	// get the address of operand in t0
 		
     	Codegen.generateIndexed("lw", "$t1", "$t0", 0);  //value from address
-		codeGen.generate("addi", "$t1", "$t1", 1);
+	Codegen.generate("addi", "$t1", "$t1", 1);
 		
     	Codegen.generateIndexed("sw", "$t1",  "$t0", 0);  //store t1 into t0
     }
@@ -1077,7 +1077,7 @@ class PostDecStmtNode extends StmtNode {
     	((IdNode)myExp).genAddr();	// get the address of operand in t0
 		
     	Codegen.generateIndexed("lw", "$t1", "$t0", 0);  //value from address
-		codeGen.generate("addi", "$t1", "$t1", -1);
+	Codegen.generate("addi", "$t1", "$t1", -1);
 		
     	Codegen.generateIndexed("sw", "$t1",  "$t0", 0);  //store t1 into t0
     }
@@ -1131,7 +1131,7 @@ class ReadStmtNode extends StmtNode {
     public void codeGen(String retLabel){
 		Codegen.generate("li", "$v0", "5");
 		Codegen.generate("syscall");
-		((idNode)myExp).genAddr();	// get address to store t0
+		((IdNode)myExp).genAddr();	// get address to store t0
 		Codegen.generateIndexed("sw", "$v0",  "$t0", 0);	// store v0 that address
     }
 
@@ -1361,13 +1361,13 @@ class IfElseStmtNode extends StmtNode {
         Codegen.genPop("$t0");	// evaluate if statement
 		
         Codegen.generate("beq", "$t0", "0", label1);	// jump to else
-        myDeclList.codeGen();
-        myStmtList.codeGen("retLabel");
+        myThenDeclList.codeGen();
+        myThenStmtList.codeGen(retLabel);
 		Codegen.generate("j", label2);	// jump over else statement
     
         Codegen.genLabel(label1);	// else statement
-		myDeclList.codeGen();
-        myStmtList.codeGen("retLabel");
+	myElseDeclList.codeGen();
+        myElseStmtList.codeGen(retLabel);
 		
 		Codegen.genLabel(label2);
     }
@@ -1443,7 +1443,7 @@ class WhileStmtNode extends StmtNode {
         Codegen.genPop("$t0");
         Codegen.generate("beq", "$t0", "0", label1);	// calculate if to enter while
         myDeclList.codeGen();
-        myStmtList.codeGen("retLabel");
+        myStmtList.codeGen(retLabel);
 		Codegen.generate("j", label2);	// start the while loop again
     
        Codegen.genLabel(label1);
