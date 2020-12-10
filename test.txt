@@ -1,3 +1,6 @@
+	.data
+	.align 2
+_p:	.space 4
 	.text
 	.globl main
 main:
@@ -6,9 +9,9 @@ main:
 	sw    $fp, 0($sp)
 	subu  $sp, $sp, 4
 	addu  $fp, $sp, 8
-	subu  $sp, $sp, 0
+	subu  $sp, $sp, 12
 	.data
-.L1:	.asciiz "Hello world!"
+.L1:	.asciiz"Hello world!"
 	.text
 	la    $t0, .L1
 	sw    $t0, 0($sp)	#PUSH
@@ -18,7 +21,7 @@ main:
 	li    $v0, 4
 	syscall
 	.data
-.L2:	.asciiz "\n"
+.L2:	.asciiz"\n"
 	.text
 	la    $t0, .L2
 	sw    $t0, 0($sp)	#PUSH
@@ -26,6 +29,138 @@ main:
 	lw    $a0, 4($sp)	#POP
 	addu  $sp, $sp, 4
 	li    $v0, 4
+	syscall
+	li    $t0, 10
+	sw    $t0, 0($sp)	#PUSH
+	subu  $sp, $sp, 4
+	la    $t0, 0($fp)
+	sw    $t0, 0($sp)	#PUSH
+	subu  $sp, $sp, 4
+	lw    $t1, 8($sp)
+	sw    $t1, 0($t0)
+	lw    $t0, 4($sp)	#POP
+	addu  $sp, $sp, 4
+	lw    $t1, 4($sp)	#POP
+	addu  $sp, $sp, 4
+	li    $t0, 8
+	sw    $t0, 0($sp)	#PUSH
+	subu  $sp, $sp, 4
+	la    $t0, -4($fp)
+	sw    $t0, 0($sp)	#PUSH
+	subu  $sp, $sp, 4
+	lw    $t1, 8($sp)
+	sw    $t1, 0($t0)
+	lw    $t0, 4($sp)	#POP
+	addu  $sp, $sp, 4
+	lw    $t1, 4($sp)	#POP
+	addu  $sp, $sp, 4
+	li    $t0, 3
+	sw    $t0, 0($sp)	#PUSH
+	subu  $sp, $sp, 4
+	la    $t0, -8($fp)
+	sw    $t0, 0($sp)	#PUSH
+	subu  $sp, $sp, 4
+	lw    $t1, 8($sp)
+	sw    $t1, 0($t0)
+	lw    $t0, 4($sp)	#POP
+	addu  $sp, $sp, 4
+	lw    $t1, 4($sp)	#POP
+	addu  $sp, $sp, 4
+	li    $t0, 4
+	sw    $t0, 0($sp)	#PUSH
+	subu  $sp, $sp, 4
+	la    $t0, -12($fp)
+	sw    $t0, 0($sp)	#PUSH
+	subu  $sp, $sp, 4
+	lw    $t1, 8($sp)
+	sw    $t1, 0($t0)
+	lw    $t0, 4($sp)	#POP
+	addu  $sp, $sp, 4
+	lw    $t1, 4($sp)	#POP
+	addu  $sp, $sp, 4
+	li    $t0, 14
+	sw    $t0, 0($sp)	#PUSH
+	subu  $sp, $sp, 4
+	la    $t0, _p
+	sw    $t0, 0($sp)	#PUSH
+	subu  $sp, $sp, 4
+	lw    $t1, 8($sp)
+	sw    $t1, 0($t0)
+	lw    $t0, 4($sp)	#POP
+	addu  $sp, $sp, 4
+	lw    $t1, 4($sp)	#POP
+	addu  $sp, $sp, 4
+	lw    $t0, 0($fp)
+	sw    $t0, 0($sp)	#PUSH
+	subu  $sp, $sp, 4
+	lw    $a0, 4($sp)	#POP
+	addu  $sp, $sp, 4
+	li    $v0, 1
+	syscall
+	.data
+.L3:	.asciiz"inbetween"
+	.text
+	la    $t0, .L3
+	sw    $t0, 0($sp)	#PUSH
+	subu  $sp, $sp, 4
+	lw    $a0, 4($sp)	#POP
+	addu  $sp, $sp, 4
+	li    $v0, 4
+	syscall
+	lw    $t0, -4($fp)
+	sw    $t0, 0($sp)	#PUSH
+	subu  $sp, $sp, 4
+	lw    $a0, 4($sp)	#POP
+	addu  $sp, $sp, 4
+	li    $v0, 1
+	syscall
+	.data
+.L4:	.asciiz"\n"
+	.text
+	la    $t0, .L4
+	sw    $t0, 0($sp)	#PUSH
+	subu  $sp, $sp, 4
+	lw    $a0, 4($sp)	#POP
+	addu  $sp, $sp, 4
+	li    $v0, 4
+	syscall
+	.data
+.L5:	.asciiz"test"
+	.text
+	la    $t0, .L5
+	sw    $t0, 0($sp)	#PUSH
+	subu  $sp, $sp, 4
+	lw    $a0, 4($sp)	#POP
+	addu  $sp, $sp, 4
+	li    $v0, 4
+	syscall
+	lw    $t0, -8($fp)
+	sw    $t0, 0($sp)	#PUSH
+	subu  $sp, $sp, 4
+	lw    $a0, 4($sp)	#POP
+	addu  $sp, $sp, 4
+	li    $v0, 1
+	syscall
+	lw    $t0, -12($fp)
+	sw    $t0, 0($sp)	#PUSH
+	subu  $sp, $sp, 4
+	lw    $a0, 4($sp)	#POP
+	addu  $sp, $sp, 4
+	li    $v0, 1
+	syscall
+	li    $t0, 2
+	sw    $t0, 0($sp)	#PUSH
+	subu  $sp, $sp, 4
+	lw    $a0, 4($sp)	#POP
+	addu  $sp, $sp, 4
+	li    $v0, 1
+	syscall
+	lw    $t0, _p
+	sw    $t0, 0($sp)	#PUSH
+	subu  $sp, $sp, 4
+	lw    $a0, 4($sp)	#POP
+	addu  $sp, $sp, 4
+	li    $v0, 1
 	syscall
 .L0:
 	lw    $ra, 0($fp)

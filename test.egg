@@ -1,4 +1,27 @@
+
+int p;
 void main() {
+    int j;
+    int k;
+    int l;
+    int m;
     cout << "Hello world!";
     cout << "\n";
+    j = 10;
+    k = 8;
+    l = 3;
+    m = 4;
+    p = 14;
+   
+    
+    cout << j;
+    cout << "inbetween";
+    cout << k;
+    cout << "\n";
+    cout << "test";
+    cout << l;
+    cout << m;
+    cout << 2;
+    cout << p;
+    
 }

@@ -189,13 +189,14 @@ class DeclListNode extends ASTnode {
     public void nameAnalysis(SymTable symTab, SymTable globalTab) {
     	int localOffset = 0;
         for (DeclNode node : myDecls) {
-            localOffset -= 4;
+            
             if (node instanceof VarDeclNode) {
                 Sym sym = ((VarDeclNode)node).nameAnalysis(symTab, globalTab, false);
                 sym.setOffset(localOffset);
             } else {
                 node.nameAnalysis(symTab, false);
             }
+            localOffset -= 4;
         }
     }
 	
@@ -566,8 +567,8 @@ class VarDeclNode extends DeclNode {
     public void codeGen() {
     	if(myId.sym().isGlobal()){
     		Codegen.generate(".data");
-    		Codegen.generate(".align", "2");
-    		Codegen.generateLabeled("_" + myId.name(), ".space", "", "4");
+    		Codegen.generate(".align ", "2");
+    		Codegen.generateLabeled("_" + myId.name(), ".space ", "", "4");
     	}
     	
     }
@@ -689,7 +690,7 @@ class FnDeclNode extends DeclNode {
     public void codeGen(){
     	if(myId.name().equals("main")){
     		Codegen.generate(".text");
-    		Codegen.generate(".globl", "main");
+    		Codegen.generate(".globl ", "main");
     		Codegen.genLabel("main");
     	}
     	else{
@@ -989,6 +990,8 @@ class AssignStmtNode extends StmtNode {
     
     public void codeGen(String retLabel){
     	
+    	myAssign.codeGen();
+    	Codegen.genPop("$t1");
     }
 
     // 1 kid
@@ -1832,8 +1835,34 @@ class IdNode extends ExpNode {
         }
     }
     
+    public void genJumpAndLink(){
+    	if(myStrVal.equals("main")){
+    		Codegen.generate("jal", "main");
+    	}
+    	else{
+    		Codegen.generate("jal", "_" + myStrVal);
+    	}
+    }
+    
     public Type codeGen(){
-    	return null;
+    	if(mySym.isGlobal()){
+    		Codegen.generate("lw", "$t0", "_" + myStrVal);
+    	}
+    	else{
+    		Codegen.generateIndexed("lw", "$t0", "$fp", mySym.getOffset()); 
+    	}
+    	Codegen.genPush("$t0");
+    	
+    	return mySym.getType();
+    }
+    
+    public void genAddr(){
+    	if(mySym.isGlobal()){
+    		Codegen.generate("la", "$t0", "_" + myStrVal);
+    	}
+    	else{
+    		Codegen.generateIndexed("la", "$t0", "$fp", mySym.getOffset()); 
+    	}
     }
 
     private int myLineNum;
@@ -2068,7 +2097,13 @@ class AssignNode extends ExpNode {
     }
     
     public Type codeGen(){
-    	return null;
+    	Type type = myExp.codeGen();
+    	((IdNode)myLhs).genAddr();
+    	Codegen.genPush("$t0");
+    	Codegen.generateIndexed("lw", "$t1", "$sp", 8);  //value from stack to t0
+    	Codegen.generateIndexed("sw", "$t1",  "$t0", 0);  //store t1 into t0
+    	Codegen.genPop("$t0");
+    	return type;
     }
 
 
