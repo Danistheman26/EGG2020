@@ -41,15 +41,15 @@ import java.util.*;
 //
 //     StmtNode:
 //       -AssignStmtNode      AssignNode
-//       PostIncStmtNode     ExpNode
-//       PostDecStmtNode     ExpNode
-//       ReadStmtNode        ExpNode
+//       -PostIncStmtNode     ExpNode
+//       -PostDecStmtNode     ExpNode
+//       -ReadStmtNode        ExpNode
 //       -WriteStmtNode       ExpNode
 //       -IfStmtNode          ExpNode, DeclListNode, StmtListNode
-//       IfElseStmtNode      ExpNode, DeclListNode, StmtListNode,
+//       -IfElseStmtNode      ExpNode, DeclListNode, StmtListNode,
 //                                    DeclListNode, StmtListNode
-//       WhileStmtNode       ExpNode, DeclListNode, StmtListNode
-//       RepeatStmtNode      ExpNode, DeclListNode, StmtListNode
+//       -WhileStmtNode       ExpNode, DeclListNode, StmtListNode
+//       -RepeatStmtNode      ExpNode, DeclListNode, StmtListNode
 //       CallStmtNode        CallExpNode
 //       ReturnStmtNode      ExpNode
 //
@@ -1030,7 +1030,12 @@ class PostIncStmtNode extends StmtNode {
     }
     
     public void codeGen(String retLabel){
-    
+    	((IdNode)myExp).genAddr();	// get the address of operand in t0
+		
+    	Codegen.generateIndexed("lw", "$t1", "$t0", 0);  //value from address
+	Codegen.generate("addi", "$t1", "$t1", 1);
+		
+    	Codegen.generateIndexed("sw", "$t1",  "$t0", 0);  //store t1 into t0
     }
 
     // 1 kid
@@ -1069,7 +1074,12 @@ class PostDecStmtNode extends StmtNode {
     }
     
     public void codeGen(String retLabel){
-    
+    	((IdNode)myExp).genAddr();	// get the address of operand in t0
+		
+    	Codegen.generateIndexed("lw", "$t1", "$t0", 0);  //value from address
+	Codegen.generate("addi", "$t1", "$t1", -1);
+		
+    	Codegen.generateIndexed("sw", "$t1",  "$t0", 0);  //store t1 into t0
     }
     
     // 1 kid
@@ -1119,7 +1129,10 @@ class ReadStmtNode extends StmtNode {
     }
     
     public void codeGen(String retLabel){
-    
+		Codegen.generate("li", "$v0", "5");
+		Codegen.generate("syscall");
+		((IdNode)myExp).genAddr();	// get address to store t0
+		Codegen.generateIndexed("sw", "$v0",  "$t0", 0);	// store v0 that address
     }
 
     // 1 kid (actually can only be an IdNode or an ArrayExpNode)
@@ -1246,16 +1259,14 @@ class IfStmtNode extends StmtNode {
     }
     
     public void codeGen(String retLabel){
-    String label = Codegen.nextLabel();
-    myExp.codeGen();
-    Codegen.genPop("$t0");
-    Codegen.generate("beq", "$t0", "0", label);
-    myDeclList.codeGen();
-    myStmtList.codeGen("retLabel");
+        String label = Codegen.nextLabel();
+        myExp.codeGen();
+        Codegen.genPop("$t0");
+        Codegen.generate("beq", "$t0", "0", label);
+        myDeclList.codeGen();
+        myStmtList.codeGen("retLabel");
     
-    Codegen.genLabel(label);
-    
-    
+       Codegen.genLabel(label);
     }
 
     // e kids
@@ -1341,9 +1352,24 @@ class IfElseStmtNode extends StmtNode {
         addIndent(p, indent);
         p.println("}");        
     }
+	
+	public void codeGen(String retLabel){
+        String label1 = Codegen.nextLabel();
+		String label2 = Codegen.nextLabel();
+		
+        myExp.codeGen();
+        Codegen.genPop("$t0");	// evaluate if statement
+		
+        Codegen.generate("beq", "$t0", "0", label1);	// jump to else
+        myThenDeclList.codeGen();
+        myThenStmtList.codeGen(retLabel);
+		Codegen.generate("j", label2);	// jump over else statement
     
-    public void codeGen(String retLabel){
-    
+        Codegen.genLabel(label1);	// else statement
+	myElseDeclList.codeGen();
+        myElseStmtList.codeGen(retLabel);
+		
+		Codegen.genLabel(label2);
     }
 
     // 5 kids
@@ -1407,9 +1433,20 @@ class WhileStmtNode extends StmtNode {
         addIndent(p, indent);
         p.println("}");
     }
+	
+	public void codeGen(String retLabel){
+        String label1 = Codegen.nextLabel();
+		String label2 = Codegen.nextLabel();
+		
+		Codegen.genLabel(label1);
+        myExp.codeGen();
+        Codegen.genPop("$t0");
+        Codegen.generate("beq", "$t0", "0", label1);	// calculate if to enter while
+        myDeclList.codeGen();
+        myStmtList.codeGen(retLabel);
+		Codegen.generate("j", label2);	// start the while loop again
     
-    public void codeGen(String retLabel){
-    
+       Codegen.genLabel(label1);
     }
 
     // 3 kids
@@ -1473,7 +1510,7 @@ class RepeatStmtNode extends StmtNode {
     }
     
     public void codeGen(String retLabel){
-    
+		// dont need to do
     }
 
     // 3 kids
