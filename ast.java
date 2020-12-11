@@ -134,7 +134,7 @@ class ProgramNode extends ASTnode {
      */
     public void nameAnalysis() {
         SymTable symTab = new SymTable();
-        myDeclList.nameAnalysis(symTab, true);
+        myDeclList.nameAnalysis(symTab, true, 0);
         
         Sym sym = symTab.lookupGlobal("main");
 		
@@ -172,12 +172,14 @@ class DeclListNode extends ASTnode {
      * nameAnalysis
      * Given a symbol table symTab, process all of the decls in the list.
      */
-    public void nameAnalysis(SymTable symTab, boolean global) {
+    public int nameAnalysis(SymTable symTab, boolean global, int currOffset) {
+		int newOffset = 0;
 		if (global) {
 			nameAnalysis(symTab, symTab, true);
 		} else {
-			nameAnalysis(symTab, symTab);
+			newOffset = nameAnalysis(symTab, symTab, currOffset);
 	    }
+		return newOffset;
 	}
     
     /**
@@ -186,17 +188,16 @@ class DeclListNode extends ASTnode {
      * (for processing struct names in variable decls), process all of the 
      * decls in the list.
      */    
-    public void nameAnalysis(SymTable symTab, SymTable globalTab) {
-    	int localOffset = 0;
+    public int nameAnalysis(SymTable symTab, SymTable globalTab, int currOffset) {
         for (DeclNode node : myDecls) {
             
             if (node instanceof VarDeclNode) {
                 Sym sym = ((VarDeclNode)node).nameAnalysis(symTab, globalTab, false);
-                sym.setOffset(localOffset);
+                sym.setOffset(currOffset);
             } else {
                 node.nameAnalysis(symTab, false);
             }
-            localOffset -= 4;
+            currOffset -= 4;
         }
     }
 	
@@ -318,9 +319,10 @@ class FnBodyNode extends ASTnode {
      * - process the declaration list
      * - process the statement list
      */
-    public void nameAnalysis(SymTable symTab) {
-        myDeclList.nameAnalysis(symTab, false);
-        myStmtList.nameAnalysis(symTab);
+    public int nameAnalysis(SymTable symTab) {
+		int offset = 0;
+        myDeclList.nameAnalysis(symTab, false, offset);
+        myStmtList.nameAnalysis(symTab, offset);
     }    
  
     /**
@@ -346,8 +348,13 @@ class FnBodyNode extends ASTnode {
     	myDeclList.codeGen();
     	myStmtList.codeGen(retLabel);
     }
+	
+	//public int getLocalsOffset() {
+	//	return localsOffset;
+	//}
 
     // 2 kids
+	//private int localsOffset;
     private DeclListNode myDeclList;
     private StmtListNode myStmtList;
 }
@@ -361,9 +368,9 @@ class StmtListNode extends ASTnode {
      * nameAnalysis
      * Given a symbol table symTab, process each statement in the list.
      */
-    public void nameAnalysis(SymTable symTab) {
+    public void nameAnalysis(SymTable symTab, int currOffset) {
         for (StmtNode node : myStmts) {
-            node.nameAnalysis(symTab);
+            node.nameAnalysis(symTab, currOffset);
         }
     }    
     
@@ -969,7 +976,7 @@ class StructNode extends TypeNode {
 // **********************************************************************
 
 abstract class StmtNode extends ASTnode {
-    abstract public void nameAnalysis(SymTable symTab);
+    abstract public int nameAnalysis(SymTable symTab, int currOffset);
     abstract public void typeCheck(Type retType);
     abstract public void codeGen(String retLabel);
 }
@@ -983,8 +990,9 @@ class AssignStmtNode extends StmtNode {
      * nameAnalysis
      * Given a symbol table symTab, perform name analysis on this node's child
      */
-    public void nameAnalysis(SymTable symTab) {
+    public int nameAnalysis(SymTable symTab, currOffset) {
         myAssign.nameAnalysis(symTab);
+		return currOffset;
     }
     
     /**
@@ -1019,8 +1027,9 @@ class PostIncStmtNode extends StmtNode {
      * nameAnalysis
      * Given a symbol table symTab, perform name analysis on this node's child
      */
-    public void nameAnalysis(SymTable symTab) {
+    public int nameAnalysis(SymTable symTab, int currOffset) {
         myExp.nameAnalysis(symTab);
+		return currOffset;
     }
     
     /**
@@ -1063,8 +1072,9 @@ class PostDecStmtNode extends StmtNode {
      * nameAnalysis
      * Given a symbol table symTab, perform name analysis on this node's child
      */
-    public void nameAnalysis(SymTable symTab) {
+    public int nameAnalysis(SymTable symTab, int currOffset) {
         myExp.nameAnalysis(symTab);
+		return currOffset;
     }
     
     /**
@@ -1107,8 +1117,9 @@ class ReadStmtNode extends StmtNode {
      * nameAnalysis
      * Given a symbol table symTab, perform name analysis on this node's child
      */
-    public void nameAnalysis(SymTable symTab) {
+    public int nameAnalysis(SymTable symTab, int currOffset) {
         myExp.nameAnalysis(symTab);
+		return currOffset;
     }    
  
     /**
@@ -1160,9 +1171,10 @@ class WriteStmtNode extends StmtNode {
      * nameAnalysis
      * Given a symbol table symTab, perform name analysis on this node's child
      */
-    public void nameAnalysis(SymTable symTab) {
+    public int nameAnalysis(SymTable symTab, int currOffset) {
         myExp.nameAnalysis(symTab);
-    }
+		return currOffset;
+    } 
 
     /**
      * typeCheck
@@ -1231,11 +1243,11 @@ class IfStmtNode extends StmtNode {
      * - process the decls and stmts
      * - exit the scope
      */
-    public void nameAnalysis(SymTable symTab) {
+    public int nameAnalysis(SymTable symTab, int currOffset) {
         myExp.nameAnalysis(symTab);
         symTab.addScope();
-        myDeclList.nameAnalysis(symTab, false);
-        myStmtList.nameAnalysis(symTab);
+        currOffset = myDeclList.nameAnalysis(symTab, false, currOffset);
+        currOffset = myStmtList.nameAnalysis(symTab, currOffset);
         try {
             symTab.removeScope();
         } catch (EmptySymTableException ex) {
@@ -1243,6 +1255,7 @@ class IfStmtNode extends StmtNode {
                                " in IfStmtNode.nameAnalysis");
             System.exit(-1);        
         }
+		return currOffset
     }
     
      /**
@@ -1309,11 +1322,11 @@ class IfElseStmtNode extends StmtNode {
      * - process the decls and stmts of else
      * - exit the scope
      */
-    public void nameAnalysis(SymTable symTab) {
+    public int nameAnalysis(SymTable symTab, int currOffset) {
         myExp.nameAnalysis(symTab);
         symTab.addScope();
-        myThenDeclList.nameAnalysis(symTab, false);
-        myThenStmtList.nameAnalysis(symTab);
+        currOffset = myThenDeclList.nameAnalysis(symTab, false, currOffset);
+        currOffset = myThenStmtList.nameAnalysis(symTab, currOffset);
         try {
             symTab.removeScope();
         } catch (EmptySymTableException ex) {
@@ -1322,8 +1335,8 @@ class IfElseStmtNode extends StmtNode {
             System.exit(-1);        
         }
         symTab.addScope();
-        myElseDeclList.nameAnalysis(symTab, false);
-        myElseStmtList.nameAnalysis(symTab);
+        currOffset = myElseDeclList.nameAnalysis(symTab, false, currOffset);
+        currOffset = myElseStmtList.nameAnalysis(symTab, currOffset);
         try {
             symTab.removeScope();
         } catch (EmptySymTableException ex) {
@@ -1331,6 +1344,7 @@ class IfElseStmtNode extends StmtNode {
                                " in IfStmtNode.nameAnalysis");
             System.exit(-1);        
         }
+		return currOffset;
     }
     
     /**
@@ -1407,11 +1421,11 @@ class WhileStmtNode extends StmtNode {
      * - process the decls and stmts
      * - exit the scope
      */
-    public void nameAnalysis(SymTable symTab) {
+    public int nameAnalysis(SymTable symTab, int currOffset) {
         myExp.nameAnalysis(symTab);
         symTab.addScope();
-        myDeclList.nameAnalysis(symTab, false);
-        myStmtList.nameAnalysis(symTab);
+        currOffset = myDeclList.nameAnalysis(symTab, false, currOffset);
+        currOffset = myStmtList.nameAnalysis(symTab, currOffset);
         try {
             symTab.removeScope();
         } catch (EmptySymTableException ex) {
@@ -1419,6 +1433,7 @@ class WhileStmtNode extends StmtNode {
                                " in IfStmtNode.nameAnalysis");
             System.exit(-1);        
         }
+		return currOffset;
     }
     
     /**
@@ -1482,11 +1497,11 @@ class RepeatStmtNode extends StmtNode {
      * - process the decls and stmts
      * - exit the scope
      */
-    public void nameAnalysis(SymTable symTab) {
+    public int nameAnalysis(SymTable symTab, currOffset) {
         myExp.nameAnalysis(symTab);
         symTab.addScope();
-        myDeclList.nameAnalysis(symTab, false);
-        myStmtList.nameAnalysis(symTab);
+        currOffset = myDeclList.nameAnalysis(symTab, false, currOffset);
+        currOffset = myStmtList.nameAnalysis(symTab, currOffset);
         try {
             symTab.removeScope();
         } catch (EmptySymTableException ex) {
@@ -1494,6 +1509,7 @@ class RepeatStmtNode extends StmtNode {
                                " in IfStmtNode.nameAnalysis");
             System.exit(-1);        
         }
+		return currOffset;
     }
     
     /**
@@ -1541,8 +1557,9 @@ class CallStmtNode extends StmtNode {
      * nameAnalysis
      * Given a symbol table symTab, perform name analysis on this node's child
      */
-    public void nameAnalysis(SymTable symTab) {
-        myCall.nameAnalysis(symTab);
+    public int nameAnalysis(SymTable symTab, int currOffset) {
+        myCall.nameAnalysis(symTab);	// FIXME ????
+		return currOffset;
     }
     
     /**
@@ -1578,10 +1595,11 @@ class ReturnStmtNode extends StmtNode {
      * Given a symbol table symTab, perform name analysis on this node's child,
      * if it has one
      */
-    public void nameAnalysis(SymTable symTab) {
+    public int nameAnalysis(SymTable symTab, int currOffset) {
         if (myExp != null) {
             myExp.nameAnalysis(symTab);
         }
+		return currOffset;
     }
 
     /**
