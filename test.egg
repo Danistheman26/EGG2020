@@ -1,37 +1,29 @@
 
 int p;
 int d;
+int f(int e, int r, int o){
+	if(e == 2){
+		return 2;
+	}
+	if(o == 3){
+		return 3;
+	}
+	return 1;
+}
+int g(int q){
+	return 1;
+}	
 void main() {
     int j;
     int k;
-    bool l;
-    bool m;
-    bool n;
-    
-    l = 4 != 3;
-    m = false != true;
-    n = 4 != 4;
-   
-    cout << l;
+    k = 10;
+    j = 5;
+    p = f(2,3,3);
+    cout << k;
     cout << "\n";
-    cout << m;
+    cout << j;
     cout << "\n";
-    cout << n;
+    cout << p;
     cout << "\n";
-    
-    l = 4 == 3;
-    m = false == true;
-    n = 4 == 4;
-   
-    cout << l;
-    cout << "\n";
-    cout << m;
-    cout << "\n";
-    cout << n;
-    cout << "\n";
-    
-    
-    
-   
-    
 }
+

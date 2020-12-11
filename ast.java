@@ -343,6 +343,7 @@ class FnBodyNode extends ASTnode {
     }
     
     public void codeGen(String retLabel){
+    	myDeclList.codeGen();
     	myStmtList.codeGen(retLabel);
     }
 
@@ -445,6 +446,17 @@ class ExpListNode extends ASTnode {
                 it.next().unparse(p, indent);
             }
         } 
+        
+    }
+    
+    public void codeGen(){
+    	ListIterator<ExpNode> it = myExps.listIterator(myExps.size());
+        if (it.hasPrevious()) { // if there is at least one element
+            it.previous().codeGen();
+            while (it.hasPrevious()) {  // print the rest of the list
+                it.previous().codeGen();
+            }
+        }
     }
 
     // list of kids (ExpNodes)
@@ -697,22 +709,22 @@ class FnDeclNode extends DeclNode {
     		Codegen.generate(".text");
     		Codegen.genLabel("_" + myId.name());
     	}
-    	Codegen.generateIndexed("sw", "$ra", "$sp", 0);
-    	Codegen.generate("subu", "$sp", "$sp", "4");
-    	Codegen.generateIndexed("sw", "$fp", "$sp", 0);
-    	Codegen.generate("subu", "$sp", "$sp", "4");
+    	Codegen.generateIndexed("sw", "$ra", "$sp", 0); //load sp into return addr
+    	Codegen.generate("subu", "$sp", "$sp", "4");  //move sp up 4
+    	Codegen.generateIndexed("sw", "$fp", "$sp", 0); //store sp into fp
+    	Codegen.generate("subu", "$sp", "$sp", "4");  //move sp up 4 more
     	Codegen.generate("addu", "$fp", "$sp", "8");
-    	Codegen.generate("subu", "$sp", "$sp", "" + Math.abs(((FnSym)myId.sym()).getLocalsOffset()));
+    	Codegen.generate("subu", "$sp", "$sp", "" + Math.abs(((FnSym)myId.sym()).getLocalsOffset()) + 4);
     	
     	String retLabel = Codegen.nextLabel();
     	
     	myBody.codeGen(retLabel);
     	
     	Codegen.genLabel(retLabel);
-    	Codegen.generateIndexed("lw", "$ra", "$fp", 0);
-    	Codegen.generate("move", "$t0", "$fp");
-    	Codegen.generateIndexed("lw", "$fp", "$fp", -4);
-    	Codegen.generate("move", "$sp", "$t0");
+    	Codegen.generateIndexed("lw", "$ra", "$fp", 0); //load fp into return address
+    	Codegen.generate("move", "$t0", "$fp"); //put fp into reg
+    	Codegen.generateIndexed("lw", "$fp", "$fp", -4); //load new fp into fp 
+    	Codegen.generate("move", "$sp", "$t0");  //
     	if(myId.name().equals("main")){
     		Codegen.generate("li", "$v0", "10");
     		Codegen.generate("syscall");
@@ -1264,7 +1276,7 @@ class IfStmtNode extends StmtNode {
         Codegen.genPop("$t0");
         Codegen.generate("beq", "$t0", "0", label);
         myDeclList.codeGen();
-        myStmtList.codeGen("retLabel");
+        myStmtList.codeGen(retLabel);
     
        Codegen.genLabel(label);
     }
@@ -1438,7 +1450,7 @@ class WhileStmtNode extends StmtNode {
         String label1 = Codegen.nextLabel();
 		String label2 = Codegen.nextLabel();
 		
-		Codegen.genLabel(label1);
+		Codegen.genLabel(label2);
         myExp.codeGen();
         Codegen.genPop("$t0");
         Codegen.generate("beq", "$t0", "0", label1);	// calculate if to enter while
@@ -1547,7 +1559,9 @@ class CallStmtNode extends StmtNode {
     }
     
     public void codeGen(String retLabel){
-    
+    	myCall.codeGen();
+    	Codegen.genPop("$t0");
+    	
     }
 
     // 1 kid
@@ -1607,6 +1621,10 @@ class ReturnStmtNode extends StmtNode {
     }
     
     public void codeGen(String retLabel){
+    	myExp.codeGen();
+    	Codegen.genPop("$v0");
+    	Codegen.generate("jr", retLabel);
+    	//jump ra
     	//TODO use retLabel here
     }
 
@@ -2233,7 +2251,10 @@ class CallExpNode extends ExpNode {
     }
     
     public Type codeGen(){
-    	return null;
+    	myExpList.codeGen();
+    	myId.genJumpAndLink();
+    	Codegen.genPush("$v0");
+    	return myId.sym().getType();
     }
 
 
